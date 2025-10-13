@@ -1,0 +1,37 @@
+package com.m.s.micosaver.ui.fragment
+
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
+import androidx.viewpager2.adapter.FragmentStateAdapter
+
+class HowToUseAdapter : FragmentStateAdapter {
+
+    private val exitsItemId: ArrayList<Long> = arrayListOf()
+
+    private var fragmentList: List<Fragment>
+
+    constructor(fm: Fragment, fragments: List<Fragment>) : super(fm) {
+        fragmentList = fragments
+    }
+
+    constructor(fm: FragmentManager, lifecycle: Lifecycle, fragments: List<Fragment>) : super(fm, lifecycle) {
+        fragmentList = fragments
+    }
+
+
+    override fun getItemCount(): Int = fragmentList.size
+
+    override fun createFragment(position: Int): Fragment {
+        if (!exitsItemId.contains(position.toLong())) {
+            exitsItemId.add(position.toLong())
+        }
+        return fragmentList[position]
+    }
+
+    override fun containsItem(itemId: Long): Boolean {
+        return exitsItemId.contains(itemId)
+    }
+
+    override fun getItemId(position: Int): Long = position.toLong()
+}

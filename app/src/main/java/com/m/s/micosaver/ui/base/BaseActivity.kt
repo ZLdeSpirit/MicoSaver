@@ -136,12 +136,12 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     protected open fun onClose() {
-        if (onShowCloseAd()) {
+//        if (onShowCloseAd()) {
 //            AdHelper.show(DropAd.ShowConfig(this, AdHelper.Position.CLOSE_INTERS).setCloseCallback {
 //                finish()
 //            })
-            return
-        }
+//            return
+//        }
         finish()
     }
 

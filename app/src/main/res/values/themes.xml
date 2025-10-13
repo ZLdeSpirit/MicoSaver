@@ -2,10 +2,23 @@
 <resources>
 
     <style name="MS_Theme.MicoSaver" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/white</item>
-        <item name="android:statusBarColor">@color/white</item>
-        <item name="android:navigationBarColor">@color/white</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/ms_page_color</item>
+        <item name="android:statusBarColor">@color/ms_page_color</item>
+        <item name="android:navigationBarColor">@color/ms_page_color</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="MS_DialogTheme1">
+        <item name="android:backgroundDimEnabled">true</item><!-- 模糊 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/MS_DialogAnim</item>
+        <item name="android:windowFrame">@android:color/transparent</item><!-- 边框 -->
+        <item name="android:windowIsTranslucent">false</item><!-- 半透明 -->
+    </style>
+
+    <style name="MS_DialogAnim" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/ms_in_anim</item>
+        <item name="android:windowExitAnimation">@anim/ms_out_anim</item>
     </style>
 
 </resources>

@@ -1,12 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:background="@drawable/ms_ic_page_main">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="39dp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="64dp"
+        android:background="@drawable/ms_ic_main_app_name_bg">
+        <ImageView
+            android:layout_width="132dp"
+            android:layout_height="29dp"
+            android:src="@drawable/ms_ic_splash_app_name"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="176dp"
+        android:layout_marginTop="18dp"
+        >
+        <ImageView
+            android:layout_width="295dp"
+            android:layout_height="146dp"
+            android:src="@drawable/ms_ic_main_1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+        
+        <ImageView
+            android:id="@+id/startIv"
+            android:layout_width="106dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ms_ic_main_start"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MicoSaver"
-        android:textSize="30sp"/>
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/startLav"
+            android:layout_width="83dp"
+            android:layout_height="66dp"
+            android:layout_marginTop="23dp"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="ms_main.json"
+            app:lottie_loop="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/startIv"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="20dp">
+        
+        <LinearLayout
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <FrameLayout
+                android:layout_width="70dp"
+                android:layout_height="70dp">
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/ms_ic_download"
+                    />
+                <TextView
+                    android:id="@+id/downloadNumTv"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="end"
+                    android:gravity="center"
+                    android:background="@drawable/ms_num_indicator"/>
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/ms_download"
+                android:textSize="14sp"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="21dp">
+            <FrameLayout
+                android:layout_width="70dp"
+                android:layout_height="70dp">
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/ms_ic_video"
+                    />
+                <TextView
+                    android:id="@+id/videosNumTv"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="end"
+                    android:gravity="center"
+                    android:background="@drawable/ms_num_indicator"/>
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/ms_videos"
+                android:textSize="14sp"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="21dp">
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ms_ic_favorite"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/ms_favorite"
+                android:textSize="14sp"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/settingsLl"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="21dp">
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ms_ic_setting"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/ms_settings"
+                android:textSize="14sp"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>
