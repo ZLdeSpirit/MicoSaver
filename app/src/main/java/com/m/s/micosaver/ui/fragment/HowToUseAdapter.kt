@@ -11,27 +11,23 @@ class HowToUseAdapter : FragmentStateAdapter {
 
     private var fragmentList: List<Fragment>
 
-    constructor(fm: Fragment, fragments: List<Fragment>) : super(fm) {
-        fragmentList = fragments
-    }
-
     constructor(fm: FragmentManager, lifecycle: Lifecycle, fragments: List<Fragment>) : super(fm, lifecycle) {
         fragmentList = fragments
     }
 
-
     override fun getItemCount(): Int = fragmentList.size
-
-    override fun createFragment(position: Int): Fragment {
-        if (!exitsItemId.contains(position.toLong())) {
-            exitsItemId.add(position.toLong())
-        }
-        return fragmentList[position]
-    }
 
     override fun containsItem(itemId: Long): Boolean {
         return exitsItemId.contains(itemId)
     }
 
     override fun getItemId(position: Int): Long = position.toLong()
+
+    override fun createFragment(position: Int): Fragment {
+        val newPos = position.toLong()
+        if (!exitsItemId.contains(newPos)) {
+            exitsItemId.add(newPos)
+        }
+        return fragmentList[position]
+    }
 }
