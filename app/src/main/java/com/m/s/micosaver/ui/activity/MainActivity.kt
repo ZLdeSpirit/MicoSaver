@@ -89,6 +89,10 @@ class MainActivity : BaseActivity() {
                 startActivity(Intent(this@MainActivity, MsLocalVideosActivity::class.java))
             }
 
+            favoriteLl.setOnClickListener {
+                startActivity(Intent(this@MainActivity, MsFavoriteActivity::class.java))
+            }
+
             downloadLl.setOnClickListener {
                 startActivity(Intent(this@MainActivity, MsDownloadingActivity::class.java))
             }

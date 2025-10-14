@@ -15,6 +15,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.m.s.micosaver.broadcast.BroadcastHelper
+import com.m.s.micosaver.ms
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -38,7 +40,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-//        drop.setProLanguage(this)
+        ms.setProLanguage(this)
         super.onCreate(savedInstanceState)
         SetPageHelper().start()
         addBackPressed()
@@ -54,21 +56,21 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun registerReceiver() {
-//        val intentFilter = IntentFilter()
-//        intentFilter.addAction(BroadcastHelper.ACTION_SWITCH_LANGUAGE)
-//        onBroadcastActionList()?.forEach {
-//            intentFilter.addAction(it)
-//        }
-//        receiver = BroadcastHelper.register(
-//            this,
-//            intentFilter
-//        ) {
-//            if (it?.action == BroadcastHelper.ACTION_SWITCH_LANGUAGE) {
-//                onRecreatePage()
-//            } else {
-//                onBroadcastActionReceived(it)
-//            }
-//        }
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(BroadcastHelper.ACTION_SWITCH_LANGUAGE)
+        onBroadcastActionList()?.forEach {
+            intentFilter.addAction(it)
+        }
+        receiver = BroadcastHelper.register(
+            this,
+            intentFilter
+        ) {
+            if (it?.action == BroadcastHelper.ACTION_SWITCH_LANGUAGE) {
+                onRecreatePage()
+            } else {
+                onBroadcastActionReceived(it)
+            }
+        }
     }
 
     protected open fun onRecreatePage() {
