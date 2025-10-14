@@ -79,8 +79,8 @@ object AppChannelHelper {
         reyunInitFbId = fbId
 
         SolarEngineManager.getInstance().apply {
-            preInit(ms, Constant.reyunKey)
-            initialize(ms, Constant.reyunKey, createReyunEngine(fbId)) {
+            preInit(ms, Constant.RE_YUN_KEY)
+            initialize(ms, Constant.RE_YUN_KEY, createReyunEngine(fbId)) {
                 if (it == 0) {
                     scope.launch {
                         // todo

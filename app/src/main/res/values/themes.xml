@@ -21,4 +21,15 @@
         <item name="android:windowExitAnimation">@anim/ms_out_anim</item>
     </style>
 
+    <style name="MS_DialogTheme2">
+        <item name="android:backgroundDimEnabled">true</item><!-- 模糊 -->
+        <item name="android:windowMinWidthMajor">50%</item>
+        <item name="android:windowFrame">@android:color/transparent</item><!-- 边框 -->
+        <item name="android:windowMinWidthMinor">50%</item>
+        <item name="android:windowNoTitle">true</item><!-- 无标题 -->
+        <item name="android:windowBackground">@android:color/transparent</item><!-- 自己想要的背景 -->
+        <item name="android:windowIsFloating">true</item><!-- 是否浮现在activity之上 -->
+        <item name="android:windowIsTranslucent">false</item><!-- 半透明 -->
+    </style>
+
 </resources>

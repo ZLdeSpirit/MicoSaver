@@ -18,4 +18,20 @@
     <string name="ms_step_2_desc_1">Click To Copy The Link To Mico Saver Downloader To Download
         The Video</string>
     <string name="ms_step_2_desc_2">Click To Share To Mico Saver Downloader To Download The Video</string>
+    <string name="ms_parse_video">Parsing Video…</string>
+    <string name="ms_save">Save</string>
+    <string name="ms_retry">Retry</string>
+    <string name="ms_parse_error_desc">Error, this app only supports video links from Facebook,
+        Instagram, X, TikTok, Snapchat and RedNote</string>
+    <string name="ms_parse_error_desc1">Error, this app only supports video links from
+        Instagram or X</string>
+    <string name="ms_view">View</string>
+    <string name="ms_play">Play</string>
+    <string name="ms_parsing_tip">Please wait, the video is being parsed</string>
+    <string name="ms_download_finish">Video download complete!</string>
+    <string name="ms_permission_title">Enable Mico Saver Notifications</string>
+    <string name="ms_permission_desc">Never Miss A New Video – Turn On Alerts To Stay In The
+        Know!</string>
+    <string name="ms_allow">Allow</string>
+    <string name="ms_ad_loading">Ad Loading</string>
 </resources>
