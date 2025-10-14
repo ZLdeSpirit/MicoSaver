@@ -32,4 +32,9 @@
         <item name="android:windowIsTranslucent">false</item><!-- 半透明 -->
     </style>
 
+    <style name="ms_round_4" parent="">
+        <item name="cornerSize">4dp</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
+
 </resources>

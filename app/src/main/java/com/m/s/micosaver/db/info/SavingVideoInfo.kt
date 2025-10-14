@@ -64,6 +64,9 @@ class SavingVideoInfo(
     @ColumnInfo(name = "ms_is_finish")
     var isFinish = false
 
+    @ColumnInfo(name = "ms_duration")
+    var duration : Long = 0L
+
     @get:Ignore
     private val downloadTask by lazy {
         ProDownloadTask()

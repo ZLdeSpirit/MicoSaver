@@ -34,4 +34,11 @@
         Know!</string>
     <string name="ms_allow">Allow</string>
     <string name="ms_ad_loading">Ad Loading</string>
+    <string name="ms_downloading">Downloading</string>
+    <string name="ms_downloading_empty_tip">No Downloads Yet? Give Our Downloader A Try!</string>
+    <string name="ms_downloading_delete_tip_title">Remove downloading video?</string>
+    <string name="ms_downloading_delete_tip_desc">Are you sure you want to remove the video you are downloading? It cannot be restored after removal and the video link needs to be parsed again.</string>
+    <string name="ms_cancel">Cancel</string>
+    <string name="ms_remove">Remove</string>
+    <string name="ms_delete_successfully">Delete successfully</string>
 </resources>

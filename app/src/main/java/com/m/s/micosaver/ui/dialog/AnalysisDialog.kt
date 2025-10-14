@@ -276,6 +276,7 @@ class AnalysisDialog (
                 json.optString("fang")
             ).apply {
                 authorName = json.optString("mme")
+                duration = json.optLong("jing")
             }
         }
 
