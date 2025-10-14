@@ -3,9 +3,10 @@ package com.m.s.micosaver.ui.dialog
 import android.view.LayoutInflater
 import android.view.View
 import com.m.s.micosaver.databinding.MsDialogPermissionBinding
+import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.base.BaseActivity
 
-class PermissionDialog(activity: BaseActivity, private val allow: () -> Unit) : BaseDialog2(activity, false) {
+class PermissionDialog(activity: BaseActivity, private val allow: () -> Unit, private val deny: () -> Unit) : BaseDialog2(activity, false) {
     private val binding by lazy { MsDialogPermissionBinding.inflate(LayoutInflater.from(context)) }
 
     override fun onRootView(): View {
@@ -16,6 +17,7 @@ class PermissionDialog(activity: BaseActivity, private val allow: () -> Unit) : 
         binding.run {
             dialogCloseIv.setOnClickListener {
                 dismiss()
+                deny.invoke()
             }
 
             allowBtn.setOnClickListener {
@@ -23,5 +25,6 @@ class PermissionDialog(activity: BaseActivity, private val allow: () -> Unit) : 
                 allow.invoke()
             }
         }
+        ms.data.showOpenMsgTime = System.currentTimeMillis()
     }
 }

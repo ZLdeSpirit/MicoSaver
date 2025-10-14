@@ -41,4 +41,11 @@
     <string name="ms_cancel">Cancel</string>
     <string name="ms_remove">Remove</string>
     <string name="ms_delete_successfully">Delete successfully</string>
+    <string name="ms_local_videos">Local Videos</string>
+    <string name="ms_share">Share</string>
+    <string name="ms_delete">Delete</string>
+    <string name="ms_select_videos">Please select videos</string>
+    <string name="ms_delete_video">Delete video?</string>
+    <string name="ms_delete_video_desc">Are you sure you want to delete all videos? You can\'t
+        recover them after deletion. You can copy the video link and re-parse it to download.</string>
 </resources>

@@ -1,17 +1,23 @@
 package com.m.s.micosaver
 
+import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Build
 import android.util.DisplayMetrics
+import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.firebase.FirebaseHelper
+import java.io.File
 import java.util.Locale
 
 lateinit var ms: MicoSaver
@@ -44,6 +50,16 @@ class MicoSaver : Application(){
                 e.printStackTrace()
             }
             return data.openAppTime
+        }
+
+    val isOpenMsg: Boolean
+        get() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                return ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+            return true
         }
 
     override fun onCreate() {
@@ -158,6 +174,41 @@ class MicoSaver : Application(){
             res.displayMetrics.setTo(oldValue)
         }
         return context
+    }
+
+    fun shareVideo(pathList: List<String>) {
+        if (pathList.isEmpty()) return
+        try {
+            val intent =
+                Intent(if (pathList.size == 1) Intent.ACTION_SEND else Intent.ACTION_SEND_MULTIPLE)
+            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.type = "video/*"
+            if (pathList.size == 1) {
+                intent.putExtra(
+                    Intent.EXTRA_STREAM,
+                    FileProvider.getUriForFile(
+                        this,
+                        "${packageName}.FileProvider",
+                        File(pathList.first())
+                    )
+                )
+            } else {
+                val uriList = arrayListOf<Uri>()
+                pathList.forEach {
+                    uriList.add(
+                        FileProvider.getUriForFile(
+                            this,
+                            "${packageName}.FileProvider",
+                            File(it)
+                        )
+                    )
+                }
+                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     inner class AppDataHelper {

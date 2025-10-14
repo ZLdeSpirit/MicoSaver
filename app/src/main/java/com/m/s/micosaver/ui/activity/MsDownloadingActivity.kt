@@ -15,7 +15,7 @@ import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.databinding.MsActivityDownloadingBinding
 import com.m.s.micosaver.databinding.MsDownloadingItemBinding
 import com.m.s.micosaver.db.info.SavingVideoInfo
-import com.m.s.micosaver.ex.toast
+import com.m.s.micosaver.ex.toastCustom
 import com.m.s.micosaver.helper.VideoHelper
 import com.m.s.micosaver.ui.base.BaseActivity
 import com.m.s.micosaver.ui.dialog.DeleteTipDialog
@@ -134,7 +134,7 @@ class MsDownloadingActivity : BaseActivity() {
                             context.getString(R.string.ms_downloading_delete_tip_desc)
                         ) {
                             deleteDownload()
-                            context.toast()
+                            context.toastCustom(getString(R.string.ms_delete_successfully) )
                         }.show()
                     }
                     downloadStateIv.setOnClickListener {

@@ -37,4 +37,9 @@
         <item name="cornerFamily">rounded</item>
     </style>
 
+    <style name="ms_round_2" parent="">
+        <item name="cornerSize">2dp</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
+
 </resources>

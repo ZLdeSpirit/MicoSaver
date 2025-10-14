@@ -23,11 +23,11 @@ fun Context.toast(msg: String) {
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
 
-fun Context.toast(msg: String = "", duration: Int = Toast.LENGTH_SHORT, gravity: Int = Gravity.CENTER) {
+fun Context.toastCustom(msg: String, duration: Int = Toast.LENGTH_SHORT, gravity: Int = Gravity.CENTER) {
     val inflater = LayoutInflater.from(this)
     val view = inflater.inflate(R.layout.ms_custom_toast, null)
     val toastTv = view.findViewById<TextView>(R.id.toastTv)
-    toastTv.text = msg.ifEmpty { getString(R.string.ms_delete_successfully) }
+    toastTv.text = msg
     Toast(this).apply {
         setView(view)
         setDuration(duration)
