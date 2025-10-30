@@ -119,7 +119,7 @@ object VideoHelper {
                 true
             ) || host.contains("x.com", true) || host.contains("facebook", true)
         } else {
-            return host.contains("instagram", true)
+            return host.contains("instagram", true) || host.contains("x.com", true)
         }
     }
 }

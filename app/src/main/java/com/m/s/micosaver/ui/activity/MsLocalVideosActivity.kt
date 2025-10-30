@@ -27,6 +27,8 @@ class MsLocalVideosActivity : BaseActivity() {
 
     private var isSelectMode = false
 
+    private var isClickEdit = false
+
     override fun onRootView(): View {
         return mBinding.root
     }
@@ -42,7 +44,9 @@ class MsLocalVideosActivity : BaseActivity() {
 
     override fun onInitView() {
         mAdapter = VideosAdapter({ selectCount, totalCount ->
-            mBinding.editIv.setImageResource(if (selectCount == totalCount) R.drawable.ms_ic_check_1 else R.drawable.ms_ic_check_3)
+            if (isClickEdit) {
+                mBinding.editIv.setImageResource(if (selectCount == totalCount) R.drawable.ms_ic_check_1 else R.drawable.ms_ic_check_3)
+            }
         })
         mBinding.apply {
             backBtn.setOnClickListener {

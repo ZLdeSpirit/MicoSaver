@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="64dp"
     android:gravity="center"
-    android:padding="4dp"
     android:background="#051A2E"
     android:id="@+id/downloadedContainer">
 
@@ -12,6 +11,7 @@
         android:id="@+id/downloadedImageIv"
         android:layout_width="56dp"
         android:layout_height="56dp"
+        android:layout_marginStart="4dp"
         android:background="@color/ms_c_default_image"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
