@@ -14,9 +14,13 @@ import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.firebase.FirebaseHelper
+import com.m.s.micosaver.helper.LifecycleHelper
+import com.m.s.micosaver.helper.SendMsgHelper
+import com.m.s.micosaver.helper.VideoHelper
 import java.io.File
 import java.util.Locale
 
@@ -65,6 +69,8 @@ class MicoSaver : Application(){
     override fun onCreate() {
         super.onCreate()
         ms = this
+        AppInitHelper().init()
+        FirebaseHelper.logEvent("ms_app_open")
     }
 
     fun initFacebook() {
@@ -76,8 +82,7 @@ class MicoSaver : Application(){
                 FacebookSdk.setClientToken(token)
                 FacebookSdk.sdkInitialize(this)
                 AppEventsLogger.activateApp(this)
-                // todo
-//                AdHelper.facebookInitSuccess()
+                AdHelper.facebookInitSuccess()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -208,6 +213,27 @@ class MicoSaver : Application(){
             startActivity(intent)
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    inner class AppInitHelper {
+
+        fun init() {
+            setProLanguage(this@MicoSaver)
+            setOpenAppTime()
+            FirebaseHelper.initFirebase()
+            AdHelper.initAd()
+            initFacebook()
+            AppChannelHelper.initMarketChannel()
+            LifecycleHelper.addLifecycleCallback()
+            SendMsgHelper.fcmToken.upload(0)
+            VideoHelper.initVideo()
+        }
+
+        private fun setOpenAppTime() {
+            if (data.openAppTime <= 0L) {
+                data.openAppTime = System.currentTimeMillis()
+            }
         }
     }
 

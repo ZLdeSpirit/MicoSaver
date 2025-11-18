@@ -21,6 +21,11 @@
             android:background="#6C6C6C"
             app:shapeAppearance="@style/ms_round_4"/>
 
+        <com.m.s.micosaver.ui.view.RectProgressView
+            android:id="@+id/rectProgressView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
         <TextView
             android:id="@+id/progressTv"
             android:layout_width="wrap_content"

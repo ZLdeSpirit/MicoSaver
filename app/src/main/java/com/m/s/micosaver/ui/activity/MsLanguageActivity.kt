@@ -5,10 +5,12 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.m.s.micosaver.R
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.databinding.MsActivityLanguageBinding
 import com.m.s.micosaver.databinding.MsLanguageItemBinding
@@ -55,34 +57,40 @@ class MsLanguageActivity : BaseActivity() {
         }
     }
 
+    override fun onRecreatePage() {
+
+    }
+
     override fun onClose() {
         if (isFirstOpen) return
         super.onClose()
     }
 
     override fun onShowCloseAd(): Boolean {
-        return false
+        return !isFirstOpen
     }
 
-//    override fun onShowFullScreenPosition(): String {
-//        return AdHelper.Position.LAN_INTERS
-//    }
-//
-//    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
-//        return AdHelper.Position.LAN_NATIVE to binding.dropAd
-//    }
-//
-//    override fun onCreatePreloadList(): List<String> {
-//        return if (isFirstOpen) {
-//            listOf(
-//                AdHelper.Position.MAIN_NATIVE,
-//                AdHelper.Position.INPUT_INTERS,
-//                onShowFullScreenPosition()
-//            )
-//        } else {
-//            listOf(onShowFullScreenPosition())
-//        }
-//    }
+    override fun onShowFullScreenPosition(): String {
+        return AdHelper.Position.LAN_INTERS
+    }
+
+    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
+        return AdHelper.Position.LAN_NATIVE to mBinding.nativeContainer
+    }
+
+    override fun onCreatePreloadList(): List<String> {
+        return if (isFirstOpen) {
+            listOf(
+                AdHelper.Position.MAIN_NATIVE,
+                AdHelper.Position.MAIN_INTERS,
+                AdHelper.Position.PARSE_INTERS,
+                AdHelper.Position.PARSE_NATIVE,
+                onShowFullScreenPosition()
+            )
+        } else {
+            listOf(onShowFullScreenPosition())
+        }
+    }
 
     inner class LanguageHolder(val binding: MsLanguageItemBinding) :
         RecyclerView.ViewHolder(binding.root)

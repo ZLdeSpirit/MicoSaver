@@ -10,6 +10,8 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.m.s.micosaver.Constant
 import com.m.s.micosaver.R
+import com.m.s.micosaver.ad.AdHelper
+import com.m.s.micosaver.ad.MsAd
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.databinding.MsDialogAnalysisBinding
 import com.m.s.micosaver.db.info.SavingVideoInfo
@@ -20,6 +22,7 @@ import com.m.s.micosaver.helper.ParamsHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.activity.MainActivity
 import com.m.s.micosaver.ui.base.BaseActivity
+import com.m.s.micosaver.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -66,7 +69,12 @@ class AnalysisDialog (
     override fun onInitView() {
         parseVideo = ParseVideo(parseUrl)
         mBinding.run {
-            errorDescTv.setText(if (AppChannelHelper.isPro) R.string.ms_parse_error_desc else R.string.ms_parse_error_desc1)
+            errorDescTv.setText(
+                if (AppChannelHelper.isPro)
+                    R.string.ms_parse_error_desc
+                else
+                    R.string.ms_parse_error_desc1
+            )
 
             dialogCloseIv.setOnClickListener {
                 dismiss()
@@ -80,14 +88,14 @@ class AnalysisDialog (
                     activity.toast(activity.getString(R.string.ms_parsing_tip))
                     return@setOnClickListener
                 }
-//                showFullScreen(AdHelper.Position.DOWNLOAD_INTERS) {
+                showFullScreen(AdHelper.Position.DOWNLOAD_INTERS) {
                     dismiss()
                     savingVideoInfo!!.startDownload()
                     context.startActivity(Intent(context, MainActivity::class.java).apply {
                         putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.SAVING.type)
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     })
-//                }
+                }
             }
 
         }
@@ -103,23 +111,21 @@ class AnalysisDialog (
 
     fun showFullScreen(position: String, close: () -> Unit) {
         FirebaseHelper.logEvent("ms_scene_${position}")
-        // todo
-//        AdHelper.show(DropAd.ShowConfig(activity, position).setCloseCallback(close))
+        AdHelper.show(MsAd.ShowConfig(activity, position).setCloseCallback(close))
     }
 
     private fun start() {
         resetParseState()
         handler.removeCallbacks(runnable, 20000)
-        //todo
-//        AdHelper.load(AdHelper.Position.PARSE_INTERS) {
-//            if (loadAdState == 1) return@load
+        AdHelper.load(AdHelper.Position.PARSE_INTERS) {
+            if (loadAdState == 1) return@load
             handler.removeCallbacks(runnable)
             if (parseState == 1) {
                 showParseAd()
             } else {
                 loadAdState = 1
             }
-//        }
+        }
         parseVideo?.start()
         FirebaseHelper.logEvent("ms_parse_start", Bundle().apply {
             putString("from", fromParse.from)
@@ -140,23 +146,23 @@ class AnalysisDialog (
     }
 
     private fun showParseAd() {
-//        showFullScreen(AdHelper.Position.PARSE_INTERS) {
-//            loadNativeAd()
+        showFullScreen(AdHelper.Position.PARSE_INTERS) {
+            loadNativeAd()
             if (savingVideoInfo == null) {
                 mBinding.run {
                     errorLl.isVisible = true
                     analysisLoadingLl.isVisible = false
                     contentNsv.isVisible = false
                 }
-                return
+                return@showFullScreen
             }
             mBinding.run {
                 errorLl.isVisible = false
                 analysisLoadingLl.isVisible = false
                 contentNsv.isVisible = true
             }
-//        }
-//        AdHelper.preload(AdHelper.Position.DOWNLOAD_INTERS)
+        }
+        AdHelper.preload(AdHelper.Position.DOWNLOAD_INTERS)
     }
 
     private fun parseSuccess(info: SavingVideoInfo) {
@@ -178,6 +184,7 @@ class AnalysisDialog (
         } else {
             parseState = 1
         }
+        Logger.logDebugI("AnalysisDialog", "parseError:${msg?:"not known"}")
         FirebaseHelper.logEvent("ms_parse_error", Bundle().apply {
             putString("msg", msg)
             putString("from", fromParse.from)
@@ -199,17 +206,16 @@ class AnalysisDialog (
             if (loadJob?.isActive == true) return
             loadJob = scope.launch {
                 delay(220)
-                //todo
-//                FirebaseHelper.logEvent("ms_scene_${AdHelper.Position.PARSE_NATIVE}")
-//                withContext(Dispatchers.Main) {
-//                    AdHelper.load(AdHelper.Position.PARSE_NATIVE) {
-//                        if (!isVisibleDialog) return@load
-//                        AdHelper.show(
-//                            DropAd.ShowConfig(activity, AdHelper.Position.PARSE_NATIVE)
-//                                .setNativeLayout(binding.dropAd)
-//                        )
-//                    }
-//                }
+                FirebaseHelper.logEvent("ms_scene_${AdHelper.Position.PARSE_NATIVE}")
+                withContext(Dispatchers.Main) {
+                    AdHelper.load(AdHelper.Position.PARSE_NATIVE) {
+                        if (!isVisibleDialog) return@load
+                        AdHelper.show(
+                            MsAd.ShowConfig(activity, AdHelper.Position.PARSE_NATIVE)
+                                .setNativeLayout(mBinding.nativeContainer)
+                        )
+                    }
+                }
             }
         }
 

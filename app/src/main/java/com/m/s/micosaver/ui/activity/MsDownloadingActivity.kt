@@ -6,11 +6,13 @@ import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.m.s.micosaver.R
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.databinding.MsActivityDownloadingBinding
 import com.m.s.micosaver.databinding.MsDownloadingItemBinding
@@ -43,6 +45,9 @@ class MsDownloadingActivity : BaseActivity() {
             backBtn.setOnClickListener {
                 onClose()
             }
+            howToUseBtn.setOnClickListener {
+                startActivity(Intent(this@MsDownloadingActivity, MsHowToUseActivity::class.java))
+            }
             adapter = DownloadingAdapter()
             recyclerView.adapter = adapter
         }
@@ -58,9 +63,9 @@ class MsDownloadingActivity : BaseActivity() {
         }
     }
 
-//    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
-//        return AdHelper.Position.ELSE_NATIVE to binding.dropAd
-//    }
+    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
+        return AdHelper.Position.SAVED_NATIVE to mBinding.nativeContainer
+    }
 
     @SuppressLint("DefaultLocale")
     fun formatMillis(duration: Long): String {
@@ -86,7 +91,7 @@ class MsDownloadingActivity : BaseActivity() {
         @SuppressLint("SetTextI18n")
         override fun onProgressChange(info: SavingVideoInfo) {
             val progress = info.progress
-//            binding.dropProgressBar.progress = progress
+            binding.rectProgressView.setProgress(progress)
             binding.progressTv.text = "$progress%"
         }
 

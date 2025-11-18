@@ -14,4 +14,9 @@ class AdLoadingDialog(activity: BaseActivity) : BaseDialog2(activity, false) {
 
     override fun onInitView() {
     }
+
+    fun showDialog(): AdLoadingDialog {
+        show()
+        return this
+    }
 }

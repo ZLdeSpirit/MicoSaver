@@ -15,12 +15,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.core.view.isGone
 import com.m.s.micosaver.R
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.databinding.MsActivityMainBinding
 import com.m.s.micosaver.db.MsDataBase
 import com.m.s.micosaver.ex.scope
-import com.m.s.micosaver.ex.toast
 import com.m.s.micosaver.ex.toastCustom
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.ParamsHelper
@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.util.Random
-import kotlin.compareTo
 import kotlin.math.abs
 
 class MainActivity : BaseActivity() {
@@ -78,23 +77,27 @@ class MainActivity : BaseActivity() {
     private fun listener() {
         mBinding.apply {
             settingsLl.setOnClickListener {
-                SettingsDialog(this@MainActivity).show()
+                showFullScreen(true){
+                    SettingsDialog(this@MainActivity).show()
+                }
             }
 
             downloadLl.setOnClickListener {
-                startActivity(Intent(this@MainActivity, MsDownloadingActivity::class.java))
+                showFullScreen(true){
+                    startActivity(Intent(this@MainActivity, MsDownloadingActivity::class.java))
+                }
             }
 
             localVideosLl.setOnClickListener {
-                startActivity(Intent(this@MainActivity, MsLocalVideosActivity::class.java))
+                showFullScreen(true){
+                    startActivity(Intent(this@MainActivity, MsLocalVideosActivity::class.java))
+                }
             }
 
             favoriteLl.setOnClickListener {
-                startActivity(Intent(this@MainActivity, MsFavoriteActivity::class.java))
-            }
-
-            downloadLl.setOnClickListener {
-                startActivity(Intent(this@MainActivity, MsDownloadingActivity::class.java))
+                showFullScreen(true){
+                    startActivity(Intent(this@MainActivity, MsFavoriteActivity::class.java))
+                }
             }
 
             startCl.setOnClickListener {
@@ -296,17 +299,17 @@ class MainActivity : BaseActivity() {
         }
     }
 
-//    override fun onResumePreloadList(): List<String> {
-//        return listOf(onShowFullScreenPosition())
-//    }
+    override fun onResumePreloadList(): List<String> {
+        return listOf(onShowFullScreenPosition())
+    }
 
-//    override fun onShowFullScreenPosition(): String {
-//        return AdHelper.Position.INPUT_INTERS
-//    }
-//
-//    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
-//        return AdHelper.Position.MAIN_NATIVE to binding.dropAd
-//    }
+    override fun onShowFullScreenPosition(): String {
+        return AdHelper.Position.MAIN_INTERS
+    }
+
+    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
+        return AdHelper.Position.MAIN_NATIVE to mBinding.nativeContainer
+    }
 
     override fun onShowCloseAd(): Boolean {
         return false

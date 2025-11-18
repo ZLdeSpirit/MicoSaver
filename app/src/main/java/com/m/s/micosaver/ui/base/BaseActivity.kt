@@ -15,8 +15,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.m.s.micosaver.ad.AdHelper
+import com.m.s.micosaver.ad.MsAd
 import com.m.s.micosaver.broadcast.BroadcastHelper
+import com.m.s.micosaver.ex.scope
+import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ms
+import com.m.s.micosaver.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -47,12 +52,12 @@ abstract class BaseActivity : AppCompatActivity() {
         setContentView(onRootView())
         onInitView()
         registerReceiver()
-//        onCreatePreloadList()?.forEach {
-//            AdHelper.preload(it)
-//        }
-//        if (onShowCloseAd()) {
-//            AdHelper.preload(AdHelper.Position.CLOSE_INTERS)
-//        }
+        onCreatePreloadList()?.forEach {
+            AdHelper.preload(it)
+        }
+        if (onShowCloseAd()) {
+            AdHelper.preload(AdHelper.Position.CLOSE_INTERS)
+        }
     }
 
     private fun registerReceiver() {
@@ -95,7 +100,7 @@ abstract class BaseActivity : AppCompatActivity() {
             nativeHelper?.load(it)
         }
         onResumePreloadList()?.forEach {
-//            AdHelper.preload(it)
+            AdHelper.preload(it)
         }
     }
 
@@ -112,38 +117,38 @@ abstract class BaseActivity : AppCompatActivity() {
 
     protected fun preloadAd() {
         onCallPreloadList()?.forEach {
-//            AdHelper.preload(it)
+            AdHelper.preload(it)
         }
     }
 
     fun load(position: String, callbacks: () -> Unit) {
-//        AdHelper.load(position, callbacks)
+        AdHelper.load(position, callbacks)
     }
 
     fun showFullScreen(isEventScene: Boolean, close: () -> Unit) {
         val position = onShowFullScreenPosition()
         if (position.isNullOrEmpty()) {
             close.invoke()
-            Log.d("AdManager", "show: position is empty")
+            Logger.logDebugI("AdManager", "show: position is empty")
             return
         }
         showFullScreen(position, isEventScene, close)
     }
 
     fun showFullScreen(position: String, isEventScene: Boolean, close: () -> Unit) {
-//        if (isEventScene) {
-//            FirebaseHelper.logEvent("drop_scene_${position}")
-//        }
-//        AdHelper.show(DropAd.ShowConfig(this, position).setCloseCallback(close))
+        if (isEventScene) {
+            FirebaseHelper.logEvent("ms_scene_${position}")
+        }
+        AdHelper.show(MsAd.ShowConfig(this, position).setCloseCallback(close))
     }
 
     protected open fun onClose() {
-//        if (onShowCloseAd()) {
-//            AdHelper.show(DropAd.ShowConfig(this, AdHelper.Position.CLOSE_INTERS).setCloseCallback {
-//                finish()
-//            })
-//            return
-//        }
+        if (onShowCloseAd()) {
+            AdHelper.show(MsAd.ShowConfig(this, AdHelper.Position.CLOSE_INTERS).setCloseCallback {
+                finish()
+            })
+            return
+        }
         finish()
     }
 
@@ -192,17 +197,17 @@ abstract class BaseActivity : AppCompatActivity() {
 
         fun load(info: Pair<String, FrameLayout>) {
             if (loadJob?.isActive == true) return
-//            loadJob = drop.scope.launch {
-//                delay(220)
-//                withContext(Dispatchers.Main) {
-//                    load(info.first) {
-//                        AdHelper.show(
-//                            DropAd.ShowConfig(this@DropPage, info.first)
-//                                .setNativeLayout(info.second)
-//                        )
-//                    }
-//                }
-//            }
+            loadJob = scope.launch {
+                delay(220)
+                withContext(Dispatchers.Main) {
+                    load(info.first) {
+                        AdHelper.show(
+                            MsAd.ShowConfig(this@BaseActivity, info.first)
+                                .setNativeLayout(info.second)
+                        )
+                    }
+                }
+            }
         }
 
         fun cancelLoad() {

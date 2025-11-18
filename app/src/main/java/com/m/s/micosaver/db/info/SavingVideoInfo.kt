@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide
 import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause
 import com.liulishuo.okdownload.core.listener.DownloadListener3
+import com.m.s.micosaver.ad.AdHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -166,8 +167,7 @@ class SavingVideoInfo(
             VideoHelper.savingVideoInfo(this@SavingVideoInfo)
             downloadCallbacks = DownloadCallbacks()
             downloadTask?.enqueue(downloadCallbacks)
-            //todo
-//            AdHelper.preload(AdHelper.Position.SAVED_NATIVE)
+            AdHelper.preload(AdHelper.Position.SAVED_NATIVE)
             FirebaseHelper.logEvent("ms_downl_start")
         }
 
