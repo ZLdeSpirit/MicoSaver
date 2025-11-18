@@ -14,7 +14,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ms_ic_launcher"
         android:label="@string/ms_app_name"
-        android:roundIcon="@mipmap/ms_ic_launcher"
+        android:roundIcon="@mipmap/ms_ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/MS_Theme.MicoSaver"
         tools:ignore="DiscouragedApi"
