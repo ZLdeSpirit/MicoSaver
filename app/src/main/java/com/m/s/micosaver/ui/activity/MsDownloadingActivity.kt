@@ -93,6 +93,9 @@ class MsDownloadingActivity : BaseActivity() {
             val progress = info.progress
             binding.rectProgressView.setProgress(progress)
             binding.progressTv.text = "$progress%"
+
+            val desc = "${formatMillis(info.duration * 1000)}  ${Formatter.formatFileSize(binding.root.context, info.totalLength)}"
+            binding.descTv.text = desc
         }
 
     }
@@ -130,7 +133,7 @@ class MsDownloadingActivity : BaseActivity() {
                     holder.onProgressChange(this)
                     Glide.with(context).load(showCoverUrl()).into(coverIv)
                     titleTv.text = videoDesc
-                    val desc = "${formatMillis(duration)}  ${Formatter.formatFileSize(context, totalLength)}"
+                    val desc = "${formatMillis(duration * 1000)}  ${Formatter.formatFileSize(context, totalLength)}"
                     descTv.text = desc
                     deleteIv.setOnClickListener {
                         DeleteTipDialog(

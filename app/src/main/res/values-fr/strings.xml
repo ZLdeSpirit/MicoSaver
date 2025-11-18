@@ -44,6 +44,7 @@
     <string name="ms_delete_video">Supprimer la vidéo ?</string>
     <string name="ms_delete_video_desc">Êtes-vous sûr de vouloir supprimer toutes les vidéos ? Vous ne pourrez pas les récupérer après suppression. Vous pouvez copier le lien de la vidéo et le ré-analyser pour la télécharger.</string>
     <string name="ms_no_content">Aucun contenu~</string>
+    <string name="ms_unknown">Inconnu</string>
 
     <!-- Français (fr) -->
     <string name="ms_msg_desc1927">🔥 Le désir a une douce lueur, 🔥 tapotez pour alimenter !</string>

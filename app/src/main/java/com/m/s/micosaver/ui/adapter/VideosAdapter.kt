@@ -91,7 +91,7 @@ class VideosAdapter(
                 }
                 likeIv.setOnClickListener {
                     VideoHelper.likeVideo(this)
-                    notifyItemChanged(position)
+                    notifyDataSetChanged()
                 }
             }
         }

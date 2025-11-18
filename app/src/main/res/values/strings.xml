@@ -49,6 +49,7 @@
     <string name="ms_delete_video_desc">Are you sure you want to delete all videos? You can\'t
         recover them after deletion. You can copy the video link and re-parse it to download.</string>
     <string name="ms_no_content">No Content~</string>
+    <string name="ms_unknown">Unknown</string>
 
     <string name="ms_msg_desc1927">🔥 Want’s soft flicker, 🔥 tap to fuel!</string>
     <string name="ms_msg_act1927">Fuel</string>

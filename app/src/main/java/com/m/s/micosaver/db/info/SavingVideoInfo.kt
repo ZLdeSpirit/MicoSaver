@@ -296,7 +296,8 @@ class SavingVideoInfo(
             intent.putExtra(ParamsHelper.KEY_VIDEO_PATH, localPath)
             val remoteViews = RemoteViews(ms.packageName, R.layout.ms_notification_downloaded)
             remoteViews.setTextViewText(R.id.downloadedDescTv, videoDesc)
-            remoteViews.setTextViewText(R.id.authorTv, authorName)
+            val author = authorName.ifEmpty { ms.getString(R.string.ms_unknown) }
+            remoteViews.setTextViewText(R.id.authorTv, author)
             remoteViews.setTextViewText(R.id.playBtn, ms.getString(R.string.ms_play))
             if (msgBitmap != null && msgBitmap?.isRecycled != true) {
                 remoteViews.setImageViewBitmap(R.id.downloadedImageIv, msgBitmap)

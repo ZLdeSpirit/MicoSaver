@@ -43,6 +43,7 @@
     <string name="ms_delete_video">Eliminar vídeo?</string>
     <string name="ms_delete_video_desc">Tem a certeza de que pretende eliminar todos os vídeos? Não poderá recuperá-los após a eliminação. Pode copiar a ligação do vídeo e analisá-la novamente para o transferir.</string>
     <string name="ms_no_content">Sem conteúdo~</string>
+    <string name="ms_unknown">Desconhecido</string>
 
     <!-- Português (pt) -->
     <string name="ms_msg_desc1927">🔥 O desejo tem um suave tremor, 🔥 toque para alimentar!</string>

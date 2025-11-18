@@ -68,7 +68,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="none"
-            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/space">
 
             <LinearLayout
@@ -77,91 +76,101 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
-                <FrameLayout
-                    android:layout_width="322dp"
-                    android:layout_height="322dp"
-                    android:background="@drawable/ms_r_121c2a_c_4">
-
-                    <ImageView
-                        android:id="@+id/imageIv"
-                        android:layout_width="181dp"
+                <LinearLayout
+                    android:id="@+id/contentLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+                    <FrameLayout
+                        android:layout_width="322dp"
                         android:layout_height="322dp"
-                        android:layout_gravity="center"
-                        android:background="@color/ms_c_default_image"
-                        android:scaleType="centerCrop" />
+                        android:background="@drawable/ms_r_121c2a_c_4">
+
+                        <ImageView
+                            android:id="@+id/imageIv"
+                            android:layout_width="181dp"
+                            android:layout_height="322dp"
+                            android:layout_gravity="center"
+                            android:background="@color/ms_c_default_image"
+                            android:scaleType="centerCrop" />
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ms_ic_play" />
+
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/saveBtn"
+                        android:layout_width="220dp"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="9dp"
+                        android:background="@drawable/ms_btn_type_2"
+                        android:gravity="center"
+                        android:text="@string/ms_save"
+                        android:textColor="@color/ms_c_031c30"
+                        android:textSize="18sp" />
+
+                    <Space
+                        android:layout_width="1px"
+                        android:layout_height="12dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/errorLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="80dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/dialogCloseIv">
 
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ms_ic_play" />
+                        android:src="@drawable/ms_ic_ana_error" />
 
-                </FrameLayout>
+                    <TextView
+                        android:id="@+id/errorDescTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:layout_marginHorizontal="60dp"
+                        android:gravity="center"/>
 
-                <TextView
-                    android:id="@+id/saveBtn"
-                    android:layout_width="220dp"
-                    android:layout_height="44dp"
-                    android:layout_marginTop="9dp"
-                    android:background="@drawable/ms_btn_type_2"
-                    android:gravity="center"
-                    android:text="@string/ms_save"
-                    android:textColor="@color/ms_c_031c30"
-                    android:textSize="18sp" />
+                    <TextView
+                        android:id="@+id/retryBtn"
+                        android:layout_width="160dp"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="24dp"
+                        android:gravity="center"
+                        android:text="@string/ms_retry"
+                        android:textColor="@color/ms_c_031c30"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:background="@drawable/ms_btn_type_2"
+                        />
 
-                <Space
-                    android:layout_width="1px"
-                    android:layout_height="12dp" />
+                    <Space
+                        android:layout_width="1px"
+                        android:layout_height="152dp"/>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/nativeContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
 
-        <LinearLayout
-            android:id="@+id/errorLl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/dialogCloseIv">
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ms_ic_ana_error" />
-
-            <TextView
-                android:id="@+id/errorDescTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:layout_marginHorizontal="60dp"
-                android:gravity="center"/>
-
-            <TextView
-                android:id="@+id/retryBtn"
-                android:layout_width="160dp"
-                android:layout_height="44dp"
-                android:layout_marginTop="24dp"
-                android:gravity="center"
-                android:text="@string/ms_retry"
-                android:textColor="@color/ms_c_031c30"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:background="@drawable/ms_btn_type_2"
-                />
-
-            <Space
-                android:layout_width="1px"
-                android:layout_height="152dp"/>
-        </LinearLayout>
-        <FrameLayout
-            android:id="@+id/nativeContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

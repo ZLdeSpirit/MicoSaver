@@ -43,6 +43,7 @@
     <string name="ms_delete_video">¿Eliminar video?</string>
     <string name="ms_delete_video_desc">¿Estás seguro de que quieres eliminar todos los videos? No podrás recuperarlos después de la eliminación. Puedes copiar el enlace del video y volver a analizarlo para descargarlo.</string>
     <string name="ms_no_content">Sin contenido~</string>
+    <string name="ms_unknown">Desconocido</string>
 
     <!-- Español (es) -->
     <string name="ms_msg_desc1927">🔥 El deseo tiene un suave titileo, 🔥 ¡toca para avivar!</string>

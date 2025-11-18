@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.format.DateUtils
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -204,6 +205,7 @@ object SendMsgHelper {
                         if (token.isNotEmpty()) {
                             ms.data.fcmTokenTime = System.currentTimeMillis()
                             ms.data.fcmToken = token
+                            Log.i("SendMsgHelper", "uploadToken success")
                             FirebaseHelper.logEvent("ms_uplo_token_success")
                             return@launch
                         }
@@ -248,6 +250,7 @@ object SendMsgHelper {
         }
 
         private fun startRetry(msg: String?) {
+            Log.i("SendMsgHelper", "uploadToken failed, msg: $msg")
             FirebaseHelper.logEvent("ms_uplo_token_failed", Bundle().apply {
                 putString("msg", msg)
             })

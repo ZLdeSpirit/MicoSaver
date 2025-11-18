@@ -141,7 +141,7 @@ class AnalysisDialog (
         mBinding.run {
             errorLl.isVisible = false
             analysisLoadingLl.isVisible = true
-            contentNsv.isVisible = true
+            contentLl.isVisible = true
         }
     }
 
@@ -152,14 +152,14 @@ class AnalysisDialog (
                 mBinding.run {
                     errorLl.isVisible = true
                     analysisLoadingLl.isVisible = false
-                    contentNsv.isVisible = false
+                    contentLl.isVisible = false
                 }
                 return@showFullScreen
             }
             mBinding.run {
                 errorLl.isVisible = false
                 analysisLoadingLl.isVisible = false
-                contentNsv.isVisible = true
+                contentLl.isVisible = true
             }
         }
         AdHelper.preload(AdHelper.Position.DOWNLOAD_INTERS)
