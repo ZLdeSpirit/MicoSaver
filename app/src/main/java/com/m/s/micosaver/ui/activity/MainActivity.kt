@@ -300,7 +300,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onResumePreloadList(): List<String> {
-        return listOf(onShowFullScreenPosition())
+        return listOf(onShowFullScreenPosition(), AdHelper.Position.ELSE_NATIVE)
     }
 
     override fun onShowFullScreenPosition(): String {

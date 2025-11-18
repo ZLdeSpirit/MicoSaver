@@ -5,6 +5,8 @@ import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.m.s.micosaver.BuildConfig
 import com.m.s.micosaver.Constant
+import com.m.s.micosaver.ad.AdHelper
+import com.m.s.micosaver.db.MsDataBase
 import com.m.s.micosaver.ex.scope
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ms
@@ -83,13 +85,12 @@ object AppChannelHelper {
             initialize(ms, Constant.RE_YUN_KEY, createReyunEngine(fbId)) {
                 if (it == 0) {
                     scope.launch {
-                        // todo
-//                        val valueList = DropDatabase.database.proAdValueDao().getAdValueList()
-//                        valueList.forEach { value ->
-//                            if (AdHelper.uploadAdValue(value)) {
-//                                DropDatabase.database.proAdValueDao().delete(value)
-//                            }
-//                        }
+                        val valueList = MsDataBase.database.proAdValueDao().getAdValueList()
+                        valueList.forEach { value ->
+                            if (AdHelper.uploadAdValue(value)) {
+                                MsDataBase.database.proAdValueDao().delete(value)
+                            }
+                        }
                     }
                     return@initialize
                 }

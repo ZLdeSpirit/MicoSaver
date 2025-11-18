@@ -2,6 +2,7 @@ package com.m.s.micosaver.ui.dialog
 
 import android.view.View
 import com.bumptech.glide.Glide
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.databinding.MsDialogDownloadFinishBinding
 import com.m.s.micosaver.db.MsDataBase
 import com.m.s.micosaver.db.info.SavingVideoInfo
@@ -23,6 +24,12 @@ class DownloadFinishDialog(
         return binding.root
     }
 
+    override fun show() {
+        super.show()
+        FirebaseHelper.logEvent("ms_scene_${AdHelper.Position.SAVED_NATIVE}")
+        activity.loadNativeAd(AdHelper.Position.SAVED_NATIVE to binding.nativeContainer)
+    }
+
     override fun onInitView() {
         binding.run {
             Glide.with(context).load(savingVideoInfo.showCoverUrl()).into(imageIv)
@@ -40,21 +47,7 @@ class DownloadFinishDialog(
 
         }
         deleteSavingVideoInfo()
-        loadShowAd()
         FirebaseHelper.logEvent("ms_video_saved")
-    }
-
-    private fun loadShowAd() {
-        //todo
-//        FirebaseHelper.logEvent("ms_scene_${AdHelper.Position.SAVED_NATIVE}")
-//        AdHelper.load(AdHelper.Position.SAVED_NATIVE) {
-//            if (isVisibleDialog) {
-//                AdHelper.show(
-//                    DropAd.ShowConfig(page, AdHelper.Position.SAVED_NATIVE)
-//                        .setNativeLayout(binding.dropAd)
-//                )
-//            }
-//        }
     }
 
     private fun playVideo() {
@@ -66,6 +59,7 @@ class DownloadFinishDialog(
     override fun dismiss() {
         super.dismiss()
         isVisibleDialog = false
+        activity.cancelLoadNativeAd()
     }
 
     private fun deleteSavingVideoInfo() {

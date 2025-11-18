@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="4dp"
+    android:background="#051A2E"
+    android:id="@+id/notificationRoot"
+    >
+
+    <TextView
+        android:id="@+id/titleTv"
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:layout_marginEnd="12dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        />
+    
+    <ImageView
+        android:id="@+id/imageIv"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        />
+
+</LinearLayout>

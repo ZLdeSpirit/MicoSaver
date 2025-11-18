@@ -104,10 +104,18 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
+    fun loadNativeAd(nativeInfo: Pair<String, FrameLayout>){
+        nativeHelper?.load(nativeInfo)
+    }
+
+    fun cancelLoadNativeAd(){
+        nativeHelper?.cancelLoad()
+    }
+
     override fun onPause() {
         isVisiblePage = false
         super.onPause()
-        nativeHelper?.cancelLoad()
+        cancelLoadNativeAd()
     }
 
     override fun onDestroy() {

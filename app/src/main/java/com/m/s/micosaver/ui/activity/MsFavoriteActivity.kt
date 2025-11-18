@@ -2,10 +2,13 @@ package com.m.s.micosaver.ui.activity
 
 import android.content.Intent
 import android.view.View
+import android.widget.FrameLayout
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.m.s.micosaver.R
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.databinding.MsActivityVideoBinding
 import com.m.s.micosaver.db.MsDataBase
@@ -40,14 +43,24 @@ class MsFavoriteActivity : BaseActivity() {
         loadData()
     }
 
+    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
+        return AdHelper.Position.ELSE_NATIVE to mBinding.nativeContainer
+    }
+
     override fun onInitView() {
+        switchBottom()
         mAdapter = VideosAdapter({ selectCount, totalCount ->
-            mBinding.editIv.setImageResource(if (selectCount == totalCount) R.drawable.ms_ic_check_1 else R.drawable.ms_ic_check_3)
+            if (isSelectMode) {
+                mBinding.editIv.setImageResource(if (selectCount == totalCount) R.drawable.ms_ic_check_1 else R.drawable.ms_ic_check_3)
+            }
         })
         mBinding.apply {
             titleTv.text = getString(R.string.ms_favorite)
             backBtn.setOnClickListener {
                 onClose()
+            }
+            howToUseBtn.setOnClickListener {
+                startActivity(Intent(this@MsFavoriteActivity, MsHowToUseActivity::class.java))
             }
 
             editIv.setOnClickListener {
@@ -58,6 +71,7 @@ class MsFavoriteActivity : BaseActivity() {
                     mAdapter.switchSelectMode()
                     backBtn.setImageResource(R.drawable.ms_ic_close_1)
                     mBinding.editIv.setImageResource(R.drawable.ms_ic_check_3)
+                    switchBottom()
                 }
             }
 
@@ -99,9 +113,22 @@ class MsFavoriteActivity : BaseActivity() {
             mAdapter.switchSelectMode()
             mBinding.backBtn.setImageResource(R.drawable.ms_ic_back)
             mBinding.editIv.setImageResource(R.drawable.ms_ic_check_2)
+            switchBottom()
         } else {
             super.onClose()
         }
+    }
+
+    private fun switchBottom(){
+        if (isSelectMode){
+            mBinding.bottomLl.isVisible = true
+            mBinding.nativeContainer.isVisible = false
+        } else {
+            mBinding.bottomLl.isVisible = false
+            mBinding.nativeContainer.isVisible = true
+            loadNativeAd(onShowNativeInfo())
+        }
+
     }
 
     private fun loadData() {
@@ -118,8 +145,4 @@ class MsFavoriteActivity : BaseActivity() {
             }
         }
     }
-
-//    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
-//        return AdHelper.Position.ELSE_NATIVE to binding.dropAd
-//    }
 }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Intent
 import android.os.Bundle
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.db.info.SavingVideoInfo
 import com.m.s.micosaver.firebase.FirebaseHelper
@@ -74,8 +75,7 @@ object LifecycleHelper {
 
         override fun onActivityStopped(activity: Activity) {
             if (--visibilityCount == 0) {
-                //TODO
-//                AdHelper.preload(AdHelper.Position.WELCOME)
+                AdHelper.preload(AdHelper.Position.WELCOME)
             }
         }
 

@@ -13,6 +13,7 @@ import com.google.firebase.remoteconfig.ConfigUpdate
 import com.google.firebase.remoteconfig.ConfigUpdateListener
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigException
 import com.google.firebase.remoteconfig.remoteConfig
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.ms
 import org.json.JSONObject
@@ -76,11 +77,11 @@ object FirebaseHelper {
                 put("ms_key_dd", false)
                 put(
                     "ms_ad_info_config",
-                    "eyJkcm9wX25hdGl2ZSI6eyJkcm9wX2xpbWl0IjoyLCJkcm9wX2lkX2xpc3QiOlt7ImRyb3BfaWQiOiJjYS1hcHAtcHViLTM5NDAyNTYwOTk5NDI1NDQvMjI0NzY5NjExMCIsImRyb3BfcHJpb3JpdHkiOjF9XX0sImRyb3BfaW50ZXJzIjp7ImRyb3BfbGltaXQiOjIsImRyb3BfaWRfbGlzdCI6W3siZHJvcF9pZCI6ImNhLWFwcC1wdWItMzk0MDI1NjA5OTk0MjU0NC8xMDMzMTczNzEyIiwiZHJvcF9wcmlvcml0eSI6MX1dfSwiZHJvcF9vcGVuIjp7ImRyb3BfbGltaXQiOjEsImRyb3BfaWRfbGlzdCI6W3siZHJvcF9pZCI6ImNhLWFwcC1wdWItMzk0MDI1NjA5OTk0MjU0NC85MjU3Mzk1OTIxIiwiZHJvcF9wcmlvcml0eSI6MiwiZHJvcF90eXBlIjoiZHJvcF9vcGVuIn0seyJkcm9wX2lkIjoiY2EtYXBwLXB1Yi0zOTQwMjU2MDk5OTQyNTQ0LzEwMzMxNzM3MTIiLCJkcm9wX3ByaW9yaXR5IjoxLCJkcm9wX3R5cGUiOiJkcm9wX2ludGVycyJ9XX19"
+                    "ewogICAgIm1zX25hdGl2ZSI6IHsKICAgICAgICAibXNfbGltaXQiOiAyLAogICAgICAgICJtc19pZF9saXN0IjogWwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAibXNfaWQiOiAiY2EtYXBwLXB1Yi0zOTQwMjU2MDk5OTQyNTQ0LzIyNDc2OTYxMTAiLAogICAgICAgICAgICAgICAgIm1zX3ByaW9yaXR5IjogMQogICAgICAgICAgICB9CiAgICAgICAgXQogICAgfSwKICAgICJtc19pbnRlcnMiOiB7CiAgICAgICAgIm1zX2xpbWl0IjogMiwKICAgICAgICAibXNfaWRfbGlzdCI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgIm1zX2lkIjogImNhLWFwcC1wdWItMzk0MDI1NjA5OTk0MjU0NC8xMDMzMTczNzEyIiwKICAgICAgICAgICAgICAgICJtc19wcmlvcml0eSI6IDEKICAgICAgICAgICAgfQogICAgICAgIF0KICAgIH0sCiAgICAibXNfb3BlbiI6IHsKICAgICAgICAibXNfbGltaXQiOiAxLAogICAgICAgICJtc19pZF9saXN0IjogWwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAibXNfaWQiOiAiY2EtYXBwLXB1Yi0zOTQwMjU2MDk5OTQyNTQ0LzkyNTczOTU5MjEiLAogICAgICAgICAgICAgICAgIm1zX3ByaW9yaXR5IjogMiwKICAgICAgICAgICAgICAgICJtc190eXBlIjogIm1zX29wZW4iCiAgICAgICAgICAgIH0sCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICJtc19pZCI6ICJjYS1hcHAtcHViLTM5NDAyNTYwOTk5NDI1NDQvMTAzMzE3MzcxMiIsCiAgICAgICAgICAgICAgICAibXNfcHJpb3JpdHkiOiAxLAogICAgICAgICAgICAgICAgIm1zX3R5cGUiOiAibXNfaW50ZXJzIgogICAgICAgICAgICB9CiAgICAgICAgXQogICAgfQp9"
                 )
                 put(
                     "ms_ad_pos_info_config",
-                    "W3siZHJvcF9wb3MiOiJkcm9wX3dlbGNvbWUiLCJkcm9wX2VuYWJsZSI6MH0seyJkcm9wX3BvcyI6ImRyb3BfbGFuX2ludGVycyIsImRyb3BfZW5hYmxlIjoxfSx7ImRyb3BfcG9zIjoiZHJvcF9sYW5fbmF0aXZlIiwiZHJvcF9lbmFibGUiOjF9LHsiZHJvcF9wb3MiOiJkcm9wX2Nsb3NlX2ludGVycyIsImRyb3BfZW5hYmxlIjoxfSx7ImRyb3BfcG9zIjoiZHJvcF9tYWluX25hdGl2ZSIsImRyb3BfZW5hYmxlIjowfSx7ImRyb3BfcG9zIjoiZHJvcF9pbnB1dF9pbnRlcnMiLCJkcm9wX2VuYWJsZSI6MX0seyJkcm9wX3BvcyI6ImRyb3BfcGFyc2VfbmF0aXZlIiwiZHJvcF9lbmFibGUiOjB9LHsiZHJvcF9wb3MiOiJkcm9wX3BhcnNlX2ludGVycyIsImRyb3BfZW5hYmxlIjowfSx7ImRyb3BfcG9zIjoiZHJvcF9kb3dubG9hZF9pbnRlcnMiLCJkcm9wX2VuYWJsZSI6MX0seyJkcm9wX3BvcyI6ImRyb3Bfc2F2ZWRfbmF0aXZlIiwiZHJvcF9lbmFibGUiOjF9LHsiZHJvcF9wb3MiOiJkcm9wX2Vsc2VfbmF0aXZlIiwiZHJvcF9lbmFibGUiOjF9XQ=="
+                    "WwogIHsKICAgICJtc19wb3MiOiAibXNfd2VsY29tZSIsCiAgICAibXNfZW5hYmxlIjogMAogIH0sCiAgewogICAgIm1zX3BvcyI6ICJtc19sYW5faW50ZXJzIiwKICAgICJtc19lbmFibGUiOiAxCiAgfSwKICB7CiAgICAibXNfcG9zIjogIm1zX2xhbl9uYXRpdmUiLAogICAgIm1zX2VuYWJsZSI6IDEKICB9LAogIHsKICAgICJtc19wb3MiOiAibXNfY2xvc2VfaW50ZXJzIiwKICAgICJtc19lbmFibGUiOiAxCiAgfSwKICB7CiAgICAibXNfcG9zIjogIm1zX21haW5fbmF0aXZlIiwKICAgICJtc19lbmFibGUiOiAwCiAgfSwKICB7CiAgICAibXNfcG9zIjogIm1zX21haW5faW50ZXJzIiwKICAgICJtc19lbmFibGUiOiAxCiAgfSwKICB7CiAgICAibXNfcG9zIjogIm1zX3BhcnNlX25hdGl2ZSIsCiAgICAibXNfZW5hYmxlIjogMAogIH0sCiAgewogICAgIm1zX3BvcyI6ICJtc19wYXJzZV9pbnRlcnMiLAogICAgIm1zX2VuYWJsZSI6IDAKICB9LAogIHsKICAgICJtc19wb3MiOiAibXNfZG93bmxvYWRfaW50ZXJzIiwKICAgICJtc19lbmFibGUiOiAxCiAgfSwKICB7CiAgICAibXNfcG9zIjogIm1zX3NhdmVkX25hdGl2ZSIsCiAgICAibXNfZW5hYmxlIjogMQogIH0sCiAgewogICAgIm1zX3BvcyI6ICJtc19lbHNlX25hdGl2ZSIsCiAgICAibXNfZW5hYmxlIjogMQogIH0KXQ=="
                 )
                 put("ms_fb_value_mul", 1.0)
                 put("ms_channel_max_time", 2 * DateUtils.DAY_IN_MILLIS)
@@ -163,8 +164,7 @@ object FirebaseHelper {
 
         private fun configChange() {
             ms.initFacebook()
-            // todo
-//            AdHelper.resetData()
+            AdHelper.resetData()
         }
 
     }

@@ -64,7 +64,7 @@ class MsDownloadingActivity : BaseActivity() {
     }
 
     override fun onShowNativeInfo(): Pair<String, FrameLayout> {
-        return AdHelper.Position.SAVED_NATIVE to mBinding.nativeContainer
+        return AdHelper.Position.ELSE_NATIVE to mBinding.nativeContainer
     }
 
     @SuppressLint("DefaultLocale")

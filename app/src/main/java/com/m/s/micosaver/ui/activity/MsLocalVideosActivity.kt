@@ -2,10 +2,13 @@ package com.m.s.micosaver.ui.activity
 
 import android.content.Intent
 import android.view.View
+import android.widget.FrameLayout
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.m.s.micosaver.R
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.databinding.MsActivityLocalVideosBinding
 import com.m.s.micosaver.db.MsDataBase
@@ -27,8 +30,6 @@ class MsLocalVideosActivity : BaseActivity() {
 
     private var isSelectMode = false
 
-    private var isClickEdit = false
-
     override fun onRootView(): View {
         return mBinding.root
     }
@@ -42,15 +43,24 @@ class MsLocalVideosActivity : BaseActivity() {
         loadData()
     }
 
+    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
+        return AdHelper.Position.ELSE_NATIVE to mBinding.nativeContainer
+    }
+
     override fun onInitView() {
+        switchBottom()
         mAdapter = VideosAdapter({ selectCount, totalCount ->
-            if (isClickEdit) {
+            if (isSelectMode) {
                 mBinding.editIv.setImageResource(if (selectCount == totalCount) R.drawable.ms_ic_check_1 else R.drawable.ms_ic_check_3)
             }
         })
         mBinding.apply {
             backBtn.setOnClickListener {
                 onClose()
+            }
+
+            howToUseBtn.setOnClickListener {
+                startActivity(Intent(this@MsLocalVideosActivity, MsHowToUseActivity::class.java))
             }
 
             editIv.setOnClickListener {
@@ -61,6 +71,7 @@ class MsLocalVideosActivity : BaseActivity() {
                     mAdapter.switchSelectMode()
                     backBtn.setImageResource(R.drawable.ms_ic_close_1)
                     mBinding.editIv.setImageResource(R.drawable.ms_ic_check_3)
+                    switchBottom()
                 }
             }
 
@@ -95,6 +106,18 @@ class MsLocalVideosActivity : BaseActivity() {
         loadData()
     }
 
+    private fun switchBottom(){
+        if (isSelectMode){
+            mBinding.localVideosBottomLl.isVisible = true
+            mBinding.nativeContainer.isVisible = false
+        } else {
+            mBinding.localVideosBottomLl.isVisible = false
+            mBinding.nativeContainer.isVisible = true
+            loadNativeAd(onShowNativeInfo())
+        }
+
+    }
+
     override fun onClose() {
         if (isSelectMode) {
             // X
@@ -102,6 +125,7 @@ class MsLocalVideosActivity : BaseActivity() {
             mAdapter.switchSelectMode()
             mBinding.backBtn.setImageResource(R.drawable.ms_ic_back)
             mBinding.editIv.setImageResource(R.drawable.ms_ic_check_2)
+            switchBottom()
         } else {
             super.onClose()
         }
@@ -122,7 +146,4 @@ class MsLocalVideosActivity : BaseActivity() {
         }
     }
 
-//    override fun onShowNativeInfo(): Pair<String, FrameLayout> {
-//        return AdHelper.Position.ELSE_NATIVE to binding.dropAd
-//    }
 }

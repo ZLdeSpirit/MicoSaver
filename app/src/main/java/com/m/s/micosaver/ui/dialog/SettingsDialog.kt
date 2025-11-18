@@ -3,7 +3,9 @@ package com.m.s.micosaver.ui.dialog
 import android.content.Intent
 import android.view.View
 import com.m.s.micosaver.BuildConfig
+import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.databinding.MsDialogSettingsBinding
+import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ui.activity.MsHowToUseActivity
 import com.m.s.micosaver.ui.activity.MsLanguageActivity
 import com.m.s.micosaver.ui.base.BaseActivity
@@ -17,6 +19,17 @@ class SettingsDialog(
 
     override fun onRootView(): View {
         return binding.root
+    }
+
+    override fun show() {
+        super.show()
+        FirebaseHelper.logEvent("ms_scene_settings")
+        activity.loadNativeAd(AdHelper.Position.ELSE_NATIVE to binding.nativeContainer)
+    }
+
+    override fun dismiss() {
+        super.dismiss()
+        activity.cancelLoadNativeAd()
     }
 
     override fun onInitView() {
