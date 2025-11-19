@@ -23,7 +23,7 @@
         <!-- TODO: 替换广告ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-4445198259368308~5742621467" />
+            android:value="ca-app-pub-8109756501810584~6175729401" />
 
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"

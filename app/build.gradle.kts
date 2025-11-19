@@ -23,7 +23,7 @@ android {
 //    resourcePrefix = "ms"
 
     defaultConfig {
-        applicationId = "com.m.s.micosaver"
+        applicationId = "com.mico.saver.videokeeper"
         minSdk = 24
         targetSdk = 36
         versionCode = 100

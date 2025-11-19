@@ -1,161 +1,29 @@
 {
   "project_info": {
-    "project_number": "474227383770",
-    "project_id": "nextchapters-f349f",
-    "storage_bucket": "nextchapters-f349f.firebasestorage.app"
+    "project_number": "156271736508",
+    "project_id": "mico-saver",
+    "storage_bucket": "mico-saver.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:3f9bc8cefd1a38f22234e3",
+        "mobilesdk_app_id": "1:156271736508:android:5626a9306087d5673b82b9",
         "android_client_info": {
-          "package_name": "com.a.s.m.scan.mate"
+          "package_name": "com.mico.saver.videokeeper"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
+          "current_key": "AIzaSyDA0UtJQBhFIPfQdr4xK1fOn1v7ar2B_rk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": []
         }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:f0009295d0b7edea2234e3",
-        "android_client_info": {
-          "package_name": "com.d.m.downmate"
-        }
       },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:4b2bc05010f93f3b2234e3",
-        "android_client_info": {
-          "package_name": "com.fantasticstories.nextchapters"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:8d5ee0fdf84acf312234e3",
-        "android_client_info": {
-          "package_name": "com.fas.vi.down"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:abcc8d4cd6999d8a2234e3",
-        "android_client_info": {
-          "package_name": "com.m.s.micosaver"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:a50b4f1ce9a0e16f2234e3",
-        "android_client_info": {
-          "package_name": "com.pinlan.vidsaver"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:a650fe574746873a2234e3",
-        "android_client_info": {
-          "package_name": "com.s.g.swiftgrab"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:474227383770:android:4c7c3a6900f6a7fc2234e3",
-        "android_client_info": {
-          "package_name": "com.v.d.vibedownloader"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwg0Tn3Sav0qcGX6M_xZjaA6qI7yJOUks"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
+      "admob_app_id": "ca-app-pub-8109756501810584~6175729401"
     }
   ],
   "configuration_version": "1"
