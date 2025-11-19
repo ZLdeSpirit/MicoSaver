@@ -19,7 +19,8 @@ android {
     namespace = "com.m.s.micosaver"
     compileSdk = 36
 
-    resourcePrefix = "ms"
+    //TODO 正式包去掉
+//    resourcePrefix = "ms"
 
     defaultConfig {
         applicationId = "com.m.s.micosaver"
