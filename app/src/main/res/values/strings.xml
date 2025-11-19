@@ -1,5 +1,5 @@
 <resources>
-    <string name="ms_app_name" translatable="false">MicoSaver</string>
+    <string name="ms_app_name" translatable="false">Mico Saver</string>
 
     <string name="ms_download">Download</string>
     <string name="ms_videos">Videos</string>

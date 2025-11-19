@@ -16,7 +16,7 @@ class VideosAdapter(
     private val selectChange: (Int, Int) -> Unit
 ) : RecyclerView.Adapter<VideosAdapter.VideosHolder>() {
 
-    private val dataList = mutableListOf<SavedVideoInfo>()
+    val dataList = mutableListOf<SavedVideoInfo>()
     val selectList = mutableListOf<SavedVideoInfo>()
     private var isSelectMode = false
 
@@ -27,6 +27,14 @@ class VideosAdapter(
         this.dataList.addAll(dataList)
         this.selectList.clear()
         selectChange.invoke(0, dataList.size)
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun likeRemoveData(info: SavedVideoInfo){
+        if (dataList.contains(info)){
+            dataList.remove(info)
+        }
         notifyDataSetChanged()
     }
 
@@ -48,6 +56,11 @@ class VideosAdapter(
         this.selectList.clear()
         selectChange.invoke(0, dataList.size)
         notifyDataSetChanged()
+    }
+
+    private var mLikeListener: ((SavedVideoInfo) -> Unit)? = null
+    fun setLikeListener(listener: (SavedVideoInfo) -> Unit){
+        mLikeListener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideosHolder {
@@ -91,6 +104,7 @@ class VideosAdapter(
                 }
                 likeIv.setOnClickListener {
                     VideoHelper.likeVideo(this)
+                    mLikeListener?.invoke(this)
                     notifyDataSetChanged()
                 }
             }

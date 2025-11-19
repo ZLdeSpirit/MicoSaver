@@ -47,13 +47,27 @@ class MsFavoriteActivity : BaseActivity() {
         return AdHelper.Position.ELSE_NATIVE to mBinding.nativeContainer
     }
 
+    override fun onResume() {
+        needLoadNative = !isSelectMode
+        super.onResume()
+    }
+
     override fun onInitView() {
         switchBottom()
         mAdapter = VideosAdapter({ selectCount, totalCount ->
             if (isSelectMode) {
                 mBinding.editIv.setImageResource(if (selectCount == totalCount) R.drawable.ms_ic_check_1 else R.drawable.ms_ic_check_3)
             }
-        })
+
+        }).apply {
+            setLikeListener{
+                mAdapter.likeRemoveData(it)
+                mBinding.run {
+                    recyclerView.isGone = this@apply.dataList.isEmpty()
+                    emptyLl.isGone = this@apply.dataList.isNotEmpty()
+                }
+            }
+        }
         mBinding.apply {
             titleTv.text = getString(R.string.ms_favorite)
             backBtn.setOnClickListener {

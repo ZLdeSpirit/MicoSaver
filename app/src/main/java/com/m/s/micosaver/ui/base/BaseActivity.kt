@@ -90,14 +90,18 @@ abstract class BaseActivity : AppCompatActivity() {
         })
     }
 
+    var needLoadNative = true
+
     override fun onResume() {
         isVisiblePage = true
         super.onResume()
-        onShowNativeInfo()?.let {
-            if (nativeHelper == null) {
-                nativeHelper = ShowNativeHelper()
+        if (needLoadNative) {
+            onShowNativeInfo()?.let {
+                if (nativeHelper == null) {
+                    nativeHelper = ShowNativeHelper()
+                }
+                nativeHelper?.load(it)
             }
-            nativeHelper?.load(it)
         }
         onResumePreloadList()?.forEach {
             AdHelper.preload(it)

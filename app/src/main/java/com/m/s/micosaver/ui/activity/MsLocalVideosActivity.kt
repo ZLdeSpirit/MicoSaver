@@ -47,6 +47,11 @@ class MsLocalVideosActivity : BaseActivity() {
         return AdHelper.Position.ELSE_NATIVE to mBinding.nativeContainer
     }
 
+    override fun onResume() {
+        needLoadNative = !isSelectMode
+        super.onResume()
+    }
+
     override fun onInitView() {
         switchBottom()
         mAdapter = VideosAdapter({ selectCount, totalCount ->
