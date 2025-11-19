@@ -87,7 +87,7 @@ object FirebaseHelper {
                 put("ms_channel_max_time", 2 * DateUtils.DAY_IN_MILLIS)
                 put(
                     "ms_defa_guide_posts_config",
-                    "WwogICJodHRwczovL3d3dy5pbnN0YWdyYW0uY29tL3JlZWwvRE9TUjlFWWtqTjQvP3V0bV9zb3VyY2U9aWdfd2ViX2NvcHlfbGluayIsCiAgImh0dHBzOi8vd3d3Lmluc3RhZ3JhbS5jb20vcmVlbC9ET1hkeXJ6RVNNay8/dXRtX3NvdXJjZT1pZ193ZWJfY29weV9saW5rIiwKICAiaHR0cHM6Ly93d3cuaW5zdGFncmFtLmNvbS9yZWVsL0RSSkF6S19rMC1PLz91dG1fc291cmNlPWlnX3dlYl9jb3B5X2xpbmsiLAogICJodHRwczovL3d3dy5pbnN0YWdyYW0uY29tL3JlZWwvRFJGdzRUZGpIVFgvP3V0bV9zb3VyY2U9aWdfd2ViX2NvcHlfbGluayIKXQ=="
+                    "WwogICJodHRwczovL3d3dy5pbnN0YWdyYW0uY29tL3JlZWxzL0RRemk2UnlFenpiLyIsCiAgImh0dHBzOi8vd3d3Lmluc3RhZ3JhbS5jb20vcmVlbHMvRFE5SjNEeWlKSVEvIiwKICAiaHR0cHM6Ly93d3cuaW5zdGFncmFtLmNvbS9yZWVscy9EUHlFNDdqalhreS8iLAogICJodHRwczovL3d3dy5pbnN0YWdyYW0uY29tL3JlZWxzL0RQdi1pbVNFOHUyLyIKXQ=="
                 )
                 put("ms_hot_open_enable", 1)
                 put("ms_ad_sh_loading_state", 0)
