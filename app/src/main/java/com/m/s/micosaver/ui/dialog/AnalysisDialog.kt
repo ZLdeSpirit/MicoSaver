@@ -116,7 +116,7 @@ class AnalysisDialog (
 
     private fun start() {
         resetParseState()
-        handler.removeCallbacks(runnable, 20000)
+        handler.postDelayed(runnable, 20000)
         AdHelper.load(AdHelper.Position.PARSE_INTERS) {
             if (loadAdState == 1) return@load
             handler.removeCallbacks(runnable)
