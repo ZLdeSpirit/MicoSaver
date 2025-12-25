@@ -318,6 +318,9 @@ object AdHelper {
 
         fun uploadClickAdValue(adValue: AdValue) {
             val value = adValue.valueMicros / 1000000.0
+
+            if (value < FirebaseHelper.remoteConfig.fbAdValueThreshold) return
+
             if (FacebookSdk.isInitialized()) {
                 val logger = AppEventsLogger.newLogger(ms)
                 logger.logEvent(AppEventsConstants.EVENT_NAME_AD_CLICK, value, Bundle().apply {
@@ -336,6 +339,9 @@ object AdHelper {
             position: String?
         ) {
             val value = adValue.valueMicros / 1000000.0
+
+            if (value < FirebaseHelper.remoteConfig.fbAdValueThreshold) return
+
             if (FacebookSdk.isInitialized()) {
                 val newVal = value * FirebaseHelper.remoteConfig.facebookValueMul
                 val logger = AppEventsLogger.newLogger(ms)

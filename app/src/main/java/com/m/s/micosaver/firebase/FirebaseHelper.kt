@@ -13,8 +13,10 @@ import com.google.firebase.remoteconfig.ConfigUpdate
 import com.google.firebase.remoteconfig.ConfigUpdateListener
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigException
 import com.google.firebase.remoteconfig.remoteConfig
+import com.m.s.micosaver.Constant
 import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.channel.AppChannelHelper
+import com.m.s.micosaver.helper.ApiRequestHelper
 import com.m.s.micosaver.ms
 import org.json.JSONObject
 
@@ -93,7 +95,13 @@ object FirebaseHelper {
                 put("ms_ad_sh_loading_state", 0)
                 put("ms_ad_sh_pre_enable", true)
                 put("ms_ad_fail_retry_enable", false)
+                put(
+                    "ms_api_req_switch",
+                    false
+                )
+                put("ms_fb_ad_value_threshold", 0.0)
 
+                put("ms_re_yun_id", Constant.RE_YUN_KEY)
             }
         }
 
@@ -149,6 +157,21 @@ object FirebaseHelper {
         val adShowLoadingState: Int
             get() = Firebase.remoteConfig.getLong("ms_ad_sh_loading_state").toInt()
 
+        val apiReqSwitch: Boolean
+            get() {
+                return Firebase.remoteConfig.getBoolean("ms_api_req_switch")
+            }
+
+        val fbAdValueThreshold: Double
+            get() {
+                return Firebase.remoteConfig.getDouble("ms_fb_ad_value_threshold")
+            }
+
+        val reYunId: String
+            get() {
+                return Firebase.remoteConfig.getString("ms_re_yun_id")
+            }
+
         override fun onUpdate(configUpdate: ConfigUpdate) {
             configChange()
         }
@@ -166,6 +189,7 @@ object FirebaseHelper {
         private fun configChange() {
             ms.initFacebook()
             AdHelper.resetData()
+            ApiRequestHelper.requestApi()
         }
 
     }
