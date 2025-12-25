@@ -63,6 +63,7 @@ object AdHelper {
         const val ELSE_NATIVE = "ms_else_native"
 
         private val enableMap = hashMapOf<String, Int>()
+        private val preLoadEnableMap = hashMapOf<String, Int>()
         private var hasConfig = false
 
         fun isOpenLoading(position: String): Boolean {
@@ -117,7 +118,37 @@ object AdHelper {
                         val jsonObject = array.getJSONObject(i)
                         val key = jsonObject.getString("ms_pos")
                         val enable = jsonObject.getInt("ms_enable")
+                        val preLoadEnable = jsonObject.getInt("ms_pre_load_enable")
                         enableMap[key] = enable
+                        preLoadEnableMap[key] = preLoadEnable
+                    }
+                    hasConfig = true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            val enable = enableMap[position] ?: return false
+            return when (enable) {
+                0 -> true
+                1 -> AppChannelHelper.isPro
+                2 -> !AppChannelHelper.isPro
+                else -> false
+            }
+        }
+
+        fun isPreLoadEnable(position: String): Boolean {
+            if (!hasConfig) {
+                val config = FirebaseHelper.remoteConfig.adPositionInfoConfig
+                if (config.isEmpty()) return false
+                try {
+                    val array = JSONArray(String(Base64.decode(config, Base64.NO_WRAP)))
+                    for (i in 0 until array.length()) {
+                        val jsonObject = array.getJSONObject(i)
+                        val key = jsonObject.getString("ms_pos")
+                        val enable = jsonObject.getInt("ms_enable")
+                        val preLoadEnable = jsonObject.getInt("ms_pre_load_enable")
+                        enableMap[key] = enable
+                        preLoadEnableMap[key] = preLoadEnable
                     }
                     hasConfig = true
                 } catch (e: Exception) {
@@ -143,9 +174,8 @@ object AdHelper {
         return Position.isEnable(position)
     }
 
-    fun preload1(type: String) {
-        Logger.logDebugI("AdManager", "preload: start preload type: $type")
-        loadManager.preload(type)
+    private fun isPreLoadEnable(position: String): Boolean {
+        return Position.isPreLoadEnable(position)
     }
 
     fun preload(vararg position: String) {
@@ -154,14 +184,20 @@ object AdHelper {
         }
     }
 
-    private fun preload2(position: String) {
+    fun preload2(position: String) {
         Logger.logDebugI("AdManager", "preload: start preload pos: $position")
+        if (!isPreLoadEnable(position)) {
+            Logger.logDebugI("AdManager", "preload: pos is not pre load enable pos: $position")
+            return
+        }
+
         if (!isEnable(position)) {
             Logger.logDebugI("AdManager", "preload: pos is not enable pos: $position")
             return
         }
         Position.getAdType(position)?.let {
-            preload1(it)
+            Logger.logDebugI("AdManager", "preload: start preload type: $it")
+            loadManager.preload(it)
         }
     }
 
