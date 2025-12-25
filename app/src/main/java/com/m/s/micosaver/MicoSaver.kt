@@ -18,6 +18,7 @@ import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.firebase.FirebaseHelper
+import com.m.s.micosaver.helper.ApiRequestHelper
 import com.m.s.micosaver.helper.LifecycleHelper
 import com.m.s.micosaver.helper.SendMsgHelper
 import com.m.s.micosaver.helper.VideoHelper
@@ -228,6 +229,7 @@ class MicoSaver : Application(){
             LifecycleHelper.addLifecycleCallback()
             SendMsgHelper.fcmToken.upload(0)
             VideoHelper.initVideo()
+            ApiRequestHelper.requestApi()
         }
 
         private fun setOpenAppTime() {
@@ -366,6 +368,14 @@ class MicoSaver : Application(){
             }
             set(value) {
                 data.edit(commit = true) { putBoolean("ms_is_showed_defa_guide", value) }
+            }
+
+        var hasReqApiSuccess: Boolean
+            get() {
+                return data.getBoolean("sv_has_req_api_success", false)
+            }
+            set(value) {
+                data.edit(commit = true) { putBoolean("sv_has_req_api_success", value) }
             }
     }
 }

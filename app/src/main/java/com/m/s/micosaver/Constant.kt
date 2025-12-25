@@ -12,4 +12,6 @@ object Constant {
     //TODO token上传
     const val UPLOAD_TOKEN_URL = "https://test.twothreemedia.xyz/check/cok/"//DEBUG
 //    const val UPLOAD_TOKEN_URL = "https://api.twothreemedia.xyz/check/cok/"//RELEASE
+
+    const val API_URL = "https://api.twothreemedia.xyz/check/ka/"//RELEASE
 }

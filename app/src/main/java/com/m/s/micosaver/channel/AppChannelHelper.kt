@@ -1,6 +1,7 @@
 package com.m.s.micosaver.channel
 
 import android.os.Bundle
+import android.util.Base64
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.m.s.micosaver.BuildConfig
@@ -81,8 +82,9 @@ object AppChannelHelper {
         reyunInitFbId = fbId
 
         SolarEngineManager.getInstance().apply {
-            preInit(ms, Constant.RE_YUN_KEY)
-            initialize(ms, Constant.RE_YUN_KEY, createReyunEngine(fbId)) {
+            val reYunId = String(Base64.decode(FirebaseHelper.remoteConfig.reYunId, Base64.NO_WRAP))
+            preInit(ms, reYunId)
+            initialize(ms, reYunId, createReyunEngine(fbId)) {
                 if (it == 0) {
                     scope.launch {
                         val valueList = MsDataBase.database.proAdValueDao().getAdValueList()

@@ -101,9 +101,19 @@ class MainActivity : BaseActivity() {
             }
 
             startCl.setOnClickListener {
-                val parseUrl = pasteContent()
+                var parseUrl = pasteContent()
                 val isValidUrl = VideoHelper.isValidVideoUrl(parseUrl)
                 if (isValidUrl || AppChannelHelper.isPro) {
+                    if (!isValidUrl && AppChannelHelper.isPro){
+                        val config = FirebaseHelper.remoteConfig.defaultGuidePostsConfig
+                        val array = JSONArray(String(Base64.decode(config, Base64.NO_WRAP)))
+                        parseUrl = if (array.length() <= 0){
+                            ""
+                        }else {
+                            array.getString(Random().nextInt(array.length()))
+                        }
+                    }
+
                     showFullScreen(true) {
                         openParse(parseUrl, isValidUrl, ParamsHelper.FromParse.PASTE)
                     }
