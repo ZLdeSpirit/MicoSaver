@@ -2,6 +2,7 @@ package com.m.s.micosaver.ad
 
 import android.os.SystemClock
 import android.text.format.DateUtils
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -171,7 +172,10 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
 
     private fun callShowAd() {
         if (FirebaseHelper.remoteConfig.adShowPreloadEnable) {
-            AdHelper.preload1(loadAdType)
+            showPosition?.let {
+                Log.d("AdManager", "callShowAd: $it")
+                AdHelper.preload2(it)
+            }
         }
         showPosition?.let {
             FirebaseHelper.logEvent("ms_ad_call_$it")
