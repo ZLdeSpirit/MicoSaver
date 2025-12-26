@@ -147,6 +147,10 @@ abstract class BaseActivity : AppCompatActivity() {
         showFullScreen(position, isEventScene, close)
     }
 
+    fun showWithPosition(position: String, close: () -> Unit){
+        showFullScreen(position, true, close)
+    }
+
     fun showSplashAd(close: () -> Unit){
         val position = AdHelper.Position.WELCOME
         FirebaseHelper.logEvent("ms_scene_${position}")

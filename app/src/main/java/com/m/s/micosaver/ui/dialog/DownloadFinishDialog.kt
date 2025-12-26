@@ -51,9 +51,11 @@ class DownloadFinishDialog(
     }
 
     private fun playVideo() {
-        FirebaseHelper.logEvent("drop_video_saved_play")
-        dismiss()
-        VideoHelper.playVideo(context, savingVideoInfo.localPath)
+        activity.showWithPosition(AdHelper.Position.MAIN_INTERS){
+            FirebaseHelper.logEvent("drop_video_saved_play")
+            dismiss()
+            VideoHelper.playVideo(context, savingVideoInfo.localPath)
+        }
     }
 
     override fun dismiss() {
