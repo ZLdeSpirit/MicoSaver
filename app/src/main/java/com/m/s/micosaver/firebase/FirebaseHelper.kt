@@ -102,6 +102,9 @@ object FirebaseHelper {
                 put("ms_fb_ad_value_threshold", 0.0)
 
                 put("ms_re_yun_id", Constant.RE_YUN_KEY)
+
+                // 是否优先展示广告价值较高的广告
+                put("ms_ad_value_pre", true)
             }
         }
 
@@ -170,6 +173,12 @@ object FirebaseHelper {
         val reYunId: String
             get() {
                 return Firebase.remoteConfig.getString("ms_re_yun_id")
+            }
+
+        //是否是广告价值优先
+        val isAdValuePre: Boolean
+            get(){
+                return Firebase.remoteConfig.getBoolean("ms_ad_value_pre")
             }
 
         override fun onUpdate(configUpdate: ConfigUpdate) {

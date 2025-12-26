@@ -75,11 +75,11 @@ class MsSplashActivity : BaseActivity(){
         handler.removeCallbacks(timeOutRunnable)
         if (isShowedAd) return
         isShowedAd = true
-        showFullScreen(false) {
-            if (isDestroyed) return@showFullScreen
+        showSplashAd {
+            if (isDestroyed) return@showSplashAd
             if (enterType == ParamsHelper.EnterType.HOT_OPEN.type || (!isVisiblePage && !LifecycleHelper.isForeground)) {
                 finish()
-                return@showFullScreen
+                return@showSplashAd
             }
             startActivity(
                 Intent(
