@@ -14,6 +14,7 @@ import com.m.s.micosaver.databinding.MsActivityVideoBinding
 import com.m.s.micosaver.db.MsDataBase
 import com.m.s.micosaver.ex.scope
 import com.m.s.micosaver.ex.toast
+import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.VideoHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.adapter.VideosAdapter
@@ -65,6 +66,12 @@ class MsFavoriteActivity : BaseActivity() {
                 mBinding.run {
                     recyclerView.isGone = this@apply.dataList.isEmpty()
                     emptyLl.isGone = this@apply.dataList.isNotEmpty()
+                }
+            }
+            setPlayListener {
+                showWithPosition(AdHelper.Position.MAIN_INTERS) {
+                    VideoHelper.playVideo(this@MsFavoriteActivity, it.videoPath)
+                    FirebaseHelper.logEvent("ms_video_click_play")
                 }
             }
         }

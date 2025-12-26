@@ -14,6 +14,7 @@ import com.m.s.micosaver.databinding.MsActivityLocalVideosBinding
 import com.m.s.micosaver.db.MsDataBase
 import com.m.s.micosaver.ex.scope
 import com.m.s.micosaver.ex.toast
+import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.VideoHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.adapter.VideosAdapter
@@ -59,6 +60,14 @@ class MsLocalVideosActivity : BaseActivity() {
                 mBinding.editIv.setImageResource(if (selectCount == totalCount) R.drawable.ms_ic_check_1 else R.drawable.ms_ic_check_3)
             }
         })
+
+        mAdapter.setPlayListener {
+            showWithPosition(AdHelper.Position.MAIN_INTERS) {
+                VideoHelper.playVideo(this, it.videoPath)
+                FirebaseHelper.logEvent("ms_video_click_play")
+            }
+        }
+
         mBinding.apply {
             backBtn.setOnClickListener {
                 onClose()

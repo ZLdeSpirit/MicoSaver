@@ -9,7 +9,6 @@ import com.bumptech.glide.Glide
 import com.m.s.micosaver.R
 import com.m.s.micosaver.databinding.MsVideosItemBinding
 import com.m.s.micosaver.db.info.SavedVideoInfo
-import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.VideoHelper
 
 class VideosAdapter(
@@ -63,6 +62,11 @@ class VideosAdapter(
         mLikeListener = listener
     }
 
+    private var mPlayListener: ((SavedVideoInfo) -> Unit)? = null
+    fun setPlayListener(listener: (SavedVideoInfo) -> Unit){
+        mPlayListener = listener
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideosHolder {
         return VideosHolder(
             MsVideosItemBinding.inflate(
@@ -98,8 +102,7 @@ class VideosAdapter(
                         selectChange.invoke(selectList.size, dataList.size)
                         notifyItemChanged(position)
                     } else {
-                        VideoHelper.playVideo(context, videoPath)
-                        FirebaseHelper.logEvent("ms_video_click_play")
+                        mPlayListener?.invoke(this)
                     }
                 }
                 likeIv.setOnClickListener {
