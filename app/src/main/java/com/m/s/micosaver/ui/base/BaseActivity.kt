@@ -133,7 +133,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun load(position: String, callbacks: () -> Unit) {
+    fun load(position: String, callbacks: (MsAd?) -> Unit) {
         AdHelper.load(position, callbacks)
     }
 
@@ -147,7 +147,13 @@ abstract class BaseActivity : AppCompatActivity() {
         showFullScreen(position, isEventScene, close)
     }
 
-    fun showFullScreen(position: String, isEventScene: Boolean, close: () -> Unit) {
+    fun showSplashAd(close: () -> Unit){
+        val position = AdHelper.Position.WELCOME
+        FirebaseHelper.logEvent("ms_scene_${position}")
+        AdHelper.showSplashAd(MsAd.ShowConfig(this, position).setCloseCallback(close))
+    }
+
+    private fun showFullScreen(position: String, isEventScene: Boolean, close: () -> Unit) {
         if (isEventScene) {
             FirebaseHelper.logEvent("ms_scene_${position}")
         }
