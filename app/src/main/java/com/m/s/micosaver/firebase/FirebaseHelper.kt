@@ -72,6 +72,8 @@ object FirebaseHelper {
             }
         }
 
+        var isRemoteComplete = false
+
         private fun getRemoteConfigDefault(): Map<String, Any> {
             return hashMapOf<String, Any>().apply {
                 // TODO 修改默认配置
@@ -192,6 +194,7 @@ object FirebaseHelper {
         override fun onComplete(p0: Task<Boolean>) {
             if (p0.isSuccessful) {
                 configChange()
+                isRemoteComplete = true
             }
         }
 
