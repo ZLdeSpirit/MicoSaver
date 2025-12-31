@@ -157,7 +157,7 @@ object AdHelper {
                     e.printStackTrace()
                 }
             }
-            val enable = enableMap[position] ?: return false
+            val enable = preLoadEnableMap[position] ?: return false
             return when (enable) {
                 0 -> true
                 1 -> AppChannelHelper.isPro
@@ -167,6 +167,7 @@ object AdHelper {
         }
 
         fun resetData() {
+            preLoadEnableMap.clear()
             enableMap.clear()
             hasConfig = false
         }
@@ -178,6 +179,11 @@ object AdHelper {
 
     private fun isPreLoadEnable(position: String): Boolean {
         return Position.isPreLoadEnable(position)
+    }
+
+    fun preload1(type: String) {
+        Logger.logDebugI("AdManager", "preload: start preload type: $type")
+        loadManager.preload(type)
     }
 
     fun preload(vararg position: String) {
@@ -228,8 +234,13 @@ object AdHelper {
         }
         getShowAd(showConfig, getAd(showConfig.position)) {
             if (it == null) {
-                Logger.logDebugI("AdManager", "show: ad is null pos: ${showConfig.position}")
-                showConfig.close?.invoke()
+                val ad = getWithoutAdValuePreAd(showConfig.position)
+                if (ad != null){
+                    ad.show(showConfig)
+                }else{
+                    Logger.logDebugI("AdManager", "show: ad is null pos: ${showConfig.position}")
+                    showConfig.close?.invoke()
+                }
                 return@getShowAd
             }
             it.show(showConfig)
@@ -252,8 +263,13 @@ object AdHelper {
 
         load(showConfig.position) { backAd ->
             if (backAd == null) {
-                Logger.logDebugI("AdManager", "show: ad is null pos: ${showConfig.position}")
-                showConfig.close?.invoke()
+                val ad = getWithoutAdValuePreAd(showConfig.position)
+                if (ad != null){
+                    ad.show(showConfig)
+                }else{
+                    Logger.logDebugI("AdManager", "show: ad is null pos: ${showConfig.position}")
+                    showConfig.close?.invoke()
+                }
                 return@load
             }
             backAd.show(showConfig)
@@ -270,11 +286,11 @@ object AdHelper {
             if (ad == null) {
                 var isTimeOut = false
                 val job = scope.launch {
-                    delay(5000)
+                    delay(8000)
                     isTimeOut = true
                     withContext(Dispatchers.Main) {
                         dialog.dismiss()
-                        callback.invoke(ad)
+                        callback.invoke(null)
                     }
                 }
                 load(showConfig.position) { backAd ->
@@ -318,6 +334,19 @@ object AdHelper {
             return ad
         }
         return null
+    }
+
+    private fun getWithoutAdValuePreAd(position: String): MsAd? {
+        if (!isEnable(position)) {
+            Logger.logDebugI("AdManager", "getWithoutAdValuePreAd: pos is not enable pos: $position")
+            return null
+        }
+        val type = Position.getAdType(position)
+        if (type.isNullOrEmpty()) {
+            Logger.logDebugI("AdManager", "getWithoutAdValuePreAd: type is null pos: $position")
+            return null
+        }
+        return loadManager.getProAd(type)
     }
 
 
@@ -391,7 +420,7 @@ object AdHelper {
         fun uploadClickAdValue(adValue: AdValue) {
             val value = adValue.valueMicros / 1000000.0
 
-            if (value < FirebaseHelper.remoteConfig.fbAdValueThreshold) return
+            if (value == 0.0 || value < FirebaseHelper.remoteConfig.fbAdValueThreshold) return
 
             if (FacebookSdk.isInitialized()) {
                 val logger = AppEventsLogger.newLogger(ms)
@@ -412,7 +441,7 @@ object AdHelper {
         ) {
             val value = adValue.valueMicros / 1000000.0
 
-            if (value < FirebaseHelper.remoteConfig.fbAdValueThreshold) return
+            if (value == 0.0 || value < FirebaseHelper.remoteConfig.fbAdValueThreshold) return
 
             if (FacebookSdk.isInitialized()) {
                 val newVal = value * FirebaseHelper.remoteConfig.facebookValueMul
@@ -558,9 +587,9 @@ object AdHelper {
 
             fun isFirstPriorityAd(ad: MsAd): Boolean{
                 val adIdConfigInfo = createLoadConfig()
-                if (adIdConfigInfo == null) return false
+                if (adIdConfigInfo == null) return true
                 val adIdInfo = adIdConfigInfo.adIdList.maxByOrNull { it.priority }
-                if (adIdInfo == null) return false
+                if (adIdInfo == null) return true
                 if (ad.adId.priority < adIdInfo.priority){
                     // 这种情况就不是优先级最高的
                     return false
@@ -574,21 +603,18 @@ object AdHelper {
 
             fun load(callback: ((MsAd?) -> Unit)?) {
                 val ad = getProAd()
-                var currentCallback: ((MsAd?) -> Unit)? = callback
+                val currentCallback: ((MsAd?) -> Unit)? = callback
                 val isAdValuePre = FirebaseHelper.remoteConfig.isAdValuePre
-                var count = adSize + loadingCount
                 if (isAdValuePre){
-                    if (ad != null && isFirstPriorityAd(ad) && currentCallback != null){
-                        currentCallback.invoke(ad)
-                        currentCallback = null
-                        count--
+                    if (ad != null && isFirstPriorityAd(ad)){
+                        currentCallback?.invoke(ad)
+                        return
                     }
                 }else{
                     if (ad != null && currentCallback != null) {
                         Logger.logDebugI("AdManager", "load: has cache ad type: $type")
                         currentCallback.invoke(ad)
-                        currentCallback = null
-                        count--
+                        return
                     }
                 }
 
@@ -598,24 +624,11 @@ object AdHelper {
                     currentCallback?.invoke(null)
                     return
                 }
+                var count = adSize + loadingCount
 
                 if (isAdValuePre){
                     // 价值优先情况，将缓存中的广告数量也从count中减去，保证能够加载到更高优先级的
                     count = count - adSize
-
-                    if (proAdList.isNotEmpty()) {
-                        val currentCacheMaxPriority = proAdList.maxByOrNull { it.adId.priority }
-                        if (currentCacheMaxPriority != null){
-                            // 将已经有的优先级广告从即将请求的adIdInfoList中移除
-                            val adInInfoList = config.adIdList.filter {
-                                it.priority > currentCacheMaxPriority.adId.priority
-                            }
-                            if (adInInfoList.isNotEmpty()) {
-                                config.adIdList.clear()
-                                config.adIdList.addAll(adInInfoList)
-                            }
-                        }
-                    }
                 }
 
                 if (count >= config.limit) {
@@ -634,10 +647,20 @@ object AdHelper {
                 loadAd(config)
             }
 
+            private val maxCachePriority: Int
+                get() {
+                    if (FirebaseHelper.remoteConfig.isAdValuePre) {
+                        return getProAd()?.adId?.priority ?: -1
+                    }
+                    return -1
+                }
+
             private fun loadAd(config: LoadConfig) {
                 scope.launch {
                     var ad: MsAd? = null
                     for (adId in config.adIdList) {
+                        if (maxCachePriority >= adId.priority) break
+
                         ad = loadAd(adId)
                         if (ad != null) break
                     }
