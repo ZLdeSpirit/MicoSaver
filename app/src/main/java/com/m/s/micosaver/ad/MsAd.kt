@@ -172,10 +172,7 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
 
     private fun callShowAd() {
         if (FirebaseHelper.remoteConfig.adShowPreloadEnable) {
-            showPosition?.let {
-                Log.d("AdManager", "callShowAd: $it")
-                AdHelper.preload2(it)
-            }
+            AdHelper.preload1(loadAdType)
         }
         showPosition?.let {
             FirebaseHelper.logEvent("ms_ad_call_$it")
