@@ -258,21 +258,14 @@ object AdHelper {
         val ad = getAd(showConfig.position)
         if (ad != null){
             ad.show(showConfig)
-            return
-        }
-
-        load(showConfig.position) { backAd ->
-            if (backAd == null) {
-                val ad = getWithoutAdValuePreAd(showConfig.position)
-                if (ad != null){
-                    ad.show(showConfig)
-                }else{
-                    Logger.logDebugI("AdManager", "show: ad is null pos: ${showConfig.position}")
-                    showConfig.close?.invoke()
-                }
-                return@load
+        }else{
+            val ad = getWithoutAdValuePreAd(showConfig.position)
+            if (ad != null){
+                ad.show(showConfig)
+            }else{
+                Logger.logDebugI("AdManager", "show: ad is null pos: ${showConfig.position}")
+                showConfig.close?.invoke()
             }
-            backAd.show(showConfig)
         }
     }
 
