@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -57,10 +58,30 @@ class MsSplashActivity : BaseActivity(){
             startUmp()
         } else {
             val launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-                loadAd()
+                isVisiblePage = true
+                startUmp()
             }
             launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+    }
+
+    // 3秒检查是否获取到远程广告配置
+    val waitRemoteConfigCountTimer = object : CountDownTimer(3000L, 1000L){
+        override fun onFinish() {
+            loadAd()
+        }
+
+        override fun onTick(millisUntilFinished: Long) {
+            if (FirebaseHelper.remoteConfig.isRemoteComplete){
+                cancel()
+                loadAd()
+            }
+        }
+
+    }
+
+    private fun waitRemoteConfig(){
+        waitRemoteConfigCountTimer.start()
     }
 
     private fun loadAd() {
@@ -142,7 +163,7 @@ class MsSplashActivity : BaseActivity(){
 
     private fun startUmp() {
         if (!isNeedUmp) {
-            loadAd()
+            waitRemoteConfig()
         } else {
             val consentInformation = UserMessagingPlatform.getConsentInformation(this)
             consentInformation.requestConsentInfoUpdate(
@@ -154,12 +175,12 @@ class MsSplashActivity : BaseActivity(){
                         if (consentInformation.canRequestAds()) {
                             AdHelper.initAd()
                         }
-                        loadAd()
+                        waitRemoteConfig()
                     }
                 },
                 {
                     isNeedUmp = false
-                    loadAd()
+                    waitRemoteConfig()
                 })
         }
     }

@@ -34,7 +34,6 @@ abstract class BaseActivity : AppCompatActivity() {
     private var nativeHelper: ShowNativeHelper? = null
 
     var isVisiblePage: Boolean = true
-        private set
 
     abstract fun onRootView(): View
 
