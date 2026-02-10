@@ -179,9 +179,15 @@ object FirebaseHelper {
 
         //是否是广告价值优先
         val isAdValuePre: Boolean
-            get(){
+            get() {
                 return Firebase.remoteConfig.getBoolean("ms_ad_value_pre")
             }
+
+        val googleFlavorConfig: String
+            get() {
+                return Firebase.remoteConfig.getString("ms_google_flavor_config")
+            }
+
 
         override fun onUpdate(configUpdate: ConfigUpdate) {
             configChange()
@@ -202,6 +208,7 @@ object FirebaseHelper {
             ms.initFacebook()
             AdHelper.resetData()
             ApiRequestHelper.requestApi()
+            AppChannelHelper.remoteConfigChange()
         }
 
     }

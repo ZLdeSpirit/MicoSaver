@@ -2,6 +2,7 @@ package com.m.s.micosaver.channel
 
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.m.s.micosaver.BuildConfig
@@ -15,6 +16,7 @@ import com.reyun.solar.engine.OnAttributionListener
 import com.reyun.solar.engine.SolarEngineConfig
 import com.reyun.solar.engine.SolarEngineManager
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONObject
 
 object AppChannelHelper {
@@ -68,9 +70,35 @@ object AppChannelHelper {
 
     private fun isMarketPro(channel: String?): Boolean {
         if (channel.isNullOrEmpty()) return false
-        val channelList = listOf("fb4a", "ig4a", "facebook", "instagram", "fb")
+        val channelList = listOf("fb4a", "ig4a", "facebook", "instagram", "fb","gclid","youtubeads")
         for (ref in channelList) {
             if (channel.contains(ref, true)) return true
+        }
+
+        return isPurchaseFlavorConfig(channel)
+    }
+
+    fun remoteConfigChange(){
+        val channel = ms.data.appMarketChannel
+        if (channel.isNullOrEmpty()) return
+        if (isMarketPro(channel)){
+            ms.data.currentProKey = "ms_key_pp"
+            FirebaseHelper.setEventPro()
+            FirebaseHelper.logEvent("ms_pp_market")
+        }
+    }
+
+    private fun isPurchaseFlavorConfig(channel: String): Boolean {
+        val config = FirebaseHelper.remoteConfig.googleFlavorConfig
+        if (config.isEmpty()) return false
+        try {
+            // remote config来配置是否是买量渠道
+            val jsonArray = JSONArray(String(Base64.decode(config, Base64.NO_WRAP)))
+            for (i in 0 until jsonArray.length()) {
+                if (channel.contains(jsonArray.getString(i), true)) return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return false
     }
