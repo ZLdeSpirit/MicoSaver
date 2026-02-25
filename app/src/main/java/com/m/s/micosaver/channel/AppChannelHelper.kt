@@ -84,7 +84,6 @@ object AppChannelHelper {
         if (isMarketPro(channel)){
             ms.data.currentProKey = "ms_key_pp"
             FirebaseHelper.setEventPro()
-            FirebaseHelper.logEvent("ms_pp_market")
         }
     }
 
