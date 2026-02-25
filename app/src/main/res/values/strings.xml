@@ -1,5 +1,5 @@
 <resources>
-    <string name="ms_app_name" translatable="false">Mico Saver</string>
+    <string name="ms_app_name" translatable="false">Night VidSaver</string>
 
     <string name="ms_download">Download</string>
     <string name="ms_videos">Videos</string>
@@ -15,9 +15,9 @@
     <string name="ms_step_1">Step - 1</string>
     <string name="ms_step_1_desc">Select The Video You Like And Click The Share Button</string>
     <string name="ms_step_2">Step - 2</string>
-    <string name="ms_step_2_desc_1">Click To Copy The Link To Mico Saver Downloader To Download
+    <string name="ms_step_2_desc_1">Click To Copy The Link To Night VidSaver Downloader To Download
         The Video</string>
-    <string name="ms_step_2_desc_2">Click To Share To Mico Saver Downloader To Download The Video</string>
+    <string name="ms_step_2_desc_2">Click To Share To Night VidSaver Downloader To Download The Video</string>
     <string name="ms_parse_video">Parsing Video…</string>
     <string name="ms_save">Save</string>
     <string name="ms_retry">Retry</string>
@@ -29,7 +29,7 @@
     <string name="ms_play">Play</string>
     <string name="ms_parsing_tip">Please wait, the video is being parsed</string>
     <string name="ms_download_finish">Video download complete!</string>
-    <string name="ms_permission_title">Enable Mico Saver Notifications</string>
+    <string name="ms_permission_title">Enable Night VidSaver Notifications</string>
     <string name="ms_permission_desc">Never Miss A New Video – Turn On Alerts To Stay In The
         Know!</string>
     <string name="ms_allow">Allow</string>

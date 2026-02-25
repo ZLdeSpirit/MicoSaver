@@ -14,8 +14,8 @@
     <string name="ms_step_1">단계 - 1</string>
     <string name="ms_step_1_desc">좋아하는 동영상을 선택하고 공유 버튼을 클릭하세요</string>
     <string name="ms_step_2">단계 - 2</string>
-    <string name="ms_step_2_desc_1">동영상을 다운로드하려면 링크를 Mico Saver Downloader에 복사하려면 클릭하세요</string>
-    <string name="ms_step_2_desc_2">동영상을 다운로드하려면 Mico Saver Downloader에 공유하려면 클릭하세요</string>
+    <string name="ms_step_2_desc_1">동영상을 다운로드하려면 링크를 Night VidSaver Downloader에 복사하려면 클릭하세요</string>
+    <string name="ms_step_2_desc_2">동영상을 다운로드하려면 Night VidSaver Downloader에 공유하려면 클릭하세요</string>
     <string name="ms_parse_video">동영상 분석 중…</string>
     <string name="ms_save">저장</string>
     <string name="ms_retry">다시 시도</string>
@@ -25,7 +25,7 @@
     <string name="ms_play">재생</string>
     <string name="ms_parsing_tip">잠시 기다려 주세요, 동영상을 분석 중입니다</string>
     <string name="ms_download_finish">동영상 다운로드 완료!</string>
-    <string name="ms_permission_title">Mico Saver 알림 사용</string>
+    <string name="ms_permission_title">Night VidSaver 알림 사용</string>
     <string name="ms_permission_desc">새 동영상을 놓치지 마세요 – 알림을 켜서 최신 정보를 받아보세요!</string>
     <string name="ms_allow">허용</string>
     <string name="ms_ad_loading">광고 로딩 중</string>

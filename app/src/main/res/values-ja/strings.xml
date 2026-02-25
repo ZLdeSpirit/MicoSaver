@@ -14,8 +14,8 @@
     <string name="ms_step_1">ステップ - 1</string>
     <string name="ms_step_1_desc">好きな動画を選択して共有ボタンをクリックしてください</string>
     <string name="ms_step_2">ステップ - 2</string>
-    <string name="ms_step_2_desc_1">動画をダウンロードするには、リンクをMico Saver Downloaderにコピーするをクリックしてください</string>
-    <string name="ms_step_2_desc_2">動画をダウンロードするには、Mico Saver Downloaderに共有するをクリックしてください</string>
+    <string name="ms_step_2_desc_1">動画をダウンロードするには、リンクをNight VidSaver Downloaderにコピーするをクリックしてください</string>
+    <string name="ms_step_2_desc_2">動画をダウンロードするには、Night VidSaver Downloaderに共有するをクリックしてください</string>
     <string name="ms_parse_video">動画を解析中…</string>
     <string name="ms_save">保存</string>
     <string name="ms_retry">再試行</string>
@@ -25,7 +25,7 @@
     <string name="ms_play">再生</string>
     <string name="ms_parsing_tip">しばらくお待ちください、動画を解析中です</string>
     <string name="ms_download_finish">動画のダウンロードが完了しました！</string>
-    <string name="ms_permission_title">Mico Saver通知を有効にする</string>
+    <string name="ms_permission_title">Night VidSaver通知を有効にする</string>
     <string name="ms_permission_desc">新しい動画を見逃さない – 通知をオンにして最新情報をチェック！</string>
     <string name="ms_allow">許可</string>
     <string name="ms_ad_loading">広告読み込み中</string>
