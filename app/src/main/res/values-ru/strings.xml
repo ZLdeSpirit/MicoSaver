@@ -14,8 +14,8 @@
     <string name="ms_step_1">Шаг - 1</string>
     <string name="ms_step_1_desc">Выберите понравившееся видео и нажмите кнопку «Поделиться»</string>
     <string name="ms_step_2">Шаг - 2</string>
-    <string name="ms_step_2_desc_1">Нажмите, чтобы скопировать ссылку в Mico Saver Downloader для загрузки видео</string>
-    <string name="ms_step_2_desc_2">Нажмите, чтобы поделиться в Mico Saver Downloader для загрузки видео</string>
+    <string name="ms_step_2_desc_1">Нажмите, чтобы скопировать ссылку в Night VidSaver Downloader для загрузки видео</string>
+    <string name="ms_step_2_desc_2">Нажмите, чтобы поделиться в Night VidSaver Downloader для загрузки видео</string>
     <string name="ms_parse_video">Анализ видео…</string>
     <string name="ms_save">Сохранить</string>
     <string name="ms_retry">Повторить</string>
@@ -25,7 +25,7 @@
     <string name="ms_play">Воспроизвести</string>
     <string name="ms_parsing_tip">Пожалуйста, подождите, видео анализируется</string>
     <string name="ms_download_finish">Загрузка видео завершена!</string>
-    <string name="ms_permission_title">Включить уведомления Mico Saver</string>
+    <string name="ms_permission_title">Включить уведомления Night VidSaver</string>
     <string name="ms_permission_desc">Никогда не пропускайте новое видео – Включите оповещения, чтобы быть в курсе!</string>
     <string name="ms_allow">Разрешить</string>
     <string name="ms_ad_loading">Загрузка рекламы</string>

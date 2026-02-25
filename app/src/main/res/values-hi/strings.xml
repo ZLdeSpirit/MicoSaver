@@ -14,8 +14,8 @@
     <string name="ms_step_1">चरण - 1</string>
     <string name="ms_step_1_desc">वह वीडियो चुनें जो आपको पसंद हो और शेयर बटन पर क्लिक करें</string>
     <string name="ms_step_2">चरण - 2</string>
-    <string name="ms_step_2_desc_1">वीडियो डाउनलोड करने के लिए लिंक को Mico Saver Downloader पर कॉपी करने के लिए क्लिक करें</string>
-    <string name="ms_step_2_desc_2">वीडियो डाउनलोड करने के लिए Mico Saver Downloader पर शेयर करने के लिए क्लिक करें</string>
+    <string name="ms_step_2_desc_1">वीडियो डाउनलोड करने के लिए लिंक को Night VidSaver Downloader पर कॉपी करने के लिए क्लिक करें</string>
+    <string name="ms_step_2_desc_2">वीडियो डाउनलोड करने के लिए Night VidSaver Downloader पर शेयर करने के लिए क्लिक करें</string>
     <string name="ms_parse_video">वीडियो पार्स किया जा रहा है…</string>
     <string name="ms_save">सेव</string>
     <string name="ms_retry">पुनः प्रयास करें</string>
@@ -25,7 +25,7 @@
     <string name="ms_play">चलाएं</string>
     <string name="ms_parsing_tip">कृपया प्रतीक्षा करें, वीडियो पार्स किया जा रहा है</string>
     <string name="ms_download_finish">वीडियो डाउनलोड पूर्ण!</string>
-    <string name="ms_permission_title">Mico Saver सूचनाएं सक्षम करें</string>
+    <string name="ms_permission_title">Night VidSaver सूचनाएं सक्षम करें</string>
     <string name="ms_permission_desc">नया वीडियो कभी न चूकें – सूचित रहने के लिए अलर्ट चालू करें!</string>
     <string name="ms_allow">अनुमति दें</string>
     <string name="ms_ad_loading">विज्ञापन लोड हो रहा है</string>
