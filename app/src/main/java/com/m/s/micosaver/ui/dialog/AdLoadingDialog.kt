@@ -5,7 +5,7 @@ import android.view.View
 import com.m.s.micosaver.databinding.MsDialogAdLoadingBinding
 import com.m.s.micosaver.ui.base.BaseActivity
 
-class AdLoadingDialog(activity: BaseActivity) : BaseDialog2(activity, false) {
+class AdLoadingDialog(private val activity: BaseActivity) : BaseDialog2(activity, false) {
     private val binding by lazy { MsDialogAdLoadingBinding.inflate(LayoutInflater.from(context)) }
 
     override fun onRootView(): View {
@@ -18,5 +18,25 @@ class AdLoadingDialog(activity: BaseActivity) : BaseDialog2(activity, false) {
     fun showDialog(): AdLoadingDialog {
         show()
         return this
+    }
+
+    override fun show() {
+        if (!activity.isFinishing &&!activity.isDestroyed && !isShowing) {
+            try {
+                super.show()
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
+    }
+
+    override fun dismiss() {
+        if (!activity.isFinishing && !activity.isDestroyed && isShowing) {
+            try {
+                super.dismiss()
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
     }
 }
