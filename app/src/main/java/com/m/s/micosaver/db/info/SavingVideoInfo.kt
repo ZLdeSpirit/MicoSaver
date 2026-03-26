@@ -80,12 +80,16 @@ class SavingVideoInfo(
             return (downloadProgress * 100f / totalLength).toInt()
         }
 
+    @Ignore
+    private var firstDownloadType: Int = -1
+
     fun showCoverUrl(): String {
         if (isFinish) return localPath
         return coverUrl.ifEmpty { downloadUrl }
     }
 
-    fun startDownload() {
+    fun startDownload(firstDownloadType: Int = -1) {
+        this.firstDownloadType = firstDownloadType
         downloadTask.start()
     }
 
@@ -238,6 +242,15 @@ class SavingVideoInfo(
                     VideoHelper.removeSavingVideoInfo(this@SavingVideoInfo)
                     withContext(Dispatchers.Main) {
                         sendDownloadMsg()
+                        // 0:默认下载。1:复制下载
+                        if (firstDownloadType == 0){
+                            FirebaseHelper.logEvent("first_default_download_succ")
+                            ms.data.firstDefaultDownloadSuccTime = System.currentTimeMillis()
+                        }else if (firstDownloadType == 1){
+                            ms.data.isFirstCopyLinkOpen = false
+                            FirebaseHelper.logEvent("first_copy_download_succ")
+                            ms.data.firstCopyDownloadSuccTime = System.currentTimeMillis()
+                        }
                         LifecycleHelper.showSavedDialog(this@SavingVideoInfo)
                     }
                     FirebaseHelper.logEvent("ms_downl_finish")

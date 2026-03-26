@@ -115,7 +115,12 @@ class MainActivity : BaseActivity() {
                     }
 
                     showFullScreen(true) {
-                        openParse(parseUrl, isValidUrl, ParamsHelper.FromParse.PASTE)
+                        val firstCopyLinkType = if (ms.data.isFirstCopyLinkOpen){
+                            1
+                        }else{
+                            -1
+                        }
+                        openParse(parseUrl, isValidUrl, ParamsHelper.FromParse.PASTE, firstCopyLinkType)
                     }
                 } else {
                     toastCustom(getString(R.string.ms_parse_error_desc1))
@@ -133,9 +138,10 @@ class MainActivity : BaseActivity() {
     private fun openParse(
         parseUrl: String?,
         isValidUrl: Boolean,
-        fromParse: ParamsHelper.FromParse
+        fromParse: ParamsHelper.FromParse,
+        firstDownloadType: Int = -1
     ) {
-        AnalysisDialog(this, isValidUrl, fromParse, parseUrl).show()
+        AnalysisDialog(this, isValidUrl, fromParse, parseUrl, firstDownloadType).show()
     }
 
     private fun pasteContent(): String? {
@@ -227,7 +233,7 @@ class MainActivity : BaseActivity() {
             openParse(
                 parseUrl,
                 VideoHelper.isValidVideoUrl(parseUrl),
-                ParamsHelper.FromParse.DEFAULT
+                ParamsHelper.FromParse.DEFAULT, 0
             )
             ms.data.isShowedDefaultGuide = true
             return true

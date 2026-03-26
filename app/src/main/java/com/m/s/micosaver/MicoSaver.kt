@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
+import android.text.format.DateUtils
 import android.util.DisplayMetrics
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -24,6 +25,7 @@ import com.m.s.micosaver.helper.SendMsgHelper
 import com.m.s.micosaver.helper.VideoHelper
 import java.io.File
 import java.util.Locale
+import kotlin.compareTo
 
 lateinit var ms: MicoSaver
     private set
@@ -230,6 +232,26 @@ class MicoSaver : Application(){
             SendMsgHelper.fcmToken.upload(0)
             VideoHelper.initVideo()
             ApiRequestHelper.requestApi()
+
+            val currentTime = System.currentTimeMillis()
+            val firstDefaultDownloadSuccTime = ms.data.firstDefaultDownloadSuccTime
+            val firstCopyDownloadSuccTime = ms.data.firstCopyDownloadSuccTime
+
+            // 下载成功过默认视频24小时内回到应用
+            if (firstDefaultDownloadSuccTime != 0L && currentTime - firstDefaultDownloadSuccTime < DateUtils.DAY_IN_MILLIS){
+                if (!ms.data.hasSet24HDefaultDownloadSucc) {
+                    ms.data.hasSet24HDefaultDownloadSucc = true
+                    FirebaseHelper.logEvent("default_download_succ_back")
+                }
+            }
+
+            // 下载成功过复制视频24小时内回到应用
+            if (firstCopyDownloadSuccTime != 0L && currentTime - firstCopyDownloadSuccTime < DateUtils.DAY_IN_MILLIS) {
+                if (!ms.data.hasSet24HCopyDownloadSucc) {
+                    ms.data.hasSet24HCopyDownloadSucc = true
+                    FirebaseHelper.logEvent("copy_download_succ_back")
+                }
+            }
         }
 
         private fun setOpenAppTime() {
@@ -376,6 +398,46 @@ class MicoSaver : Application(){
             }
             set(value) {
                 data.edit(commit = true) { putBoolean("sv_has_req_api_success", value) }
+            }
+
+        var isFirstCopyLinkOpen: Boolean
+            get() {
+                return data.getBoolean("is_first_copy_link_open", true)
+            }
+            set(value) {
+                data.edit(commit = true) { putBoolean("is_first_copy_link_open", value) }
+            }
+
+        var firstDefaultDownloadSuccTime : Long
+            get() {
+                return data.getLong("first_default_download_succ", 0L)
+            }
+            set(value) {
+                data.edit(commit = true) { putLong("first_default_download_succ", value) }
+            }
+
+        var firstCopyDownloadSuccTime : Long
+            get() {
+                return data.getLong("first_copy_download_succ", 0L)
+            }
+            set(value) {
+                data.edit(commit = true) { putLong("first_copy_download_succ", value) }
+            }
+
+        var hasSet24HDefaultDownloadSucc: Boolean
+            get() {
+                return data.getBoolean("24h_default_download", false)
+            }
+            set(value) {
+                data.edit(commit = true) { putBoolean("24h_default_download", value) }
+            }
+
+        var hasSet24HCopyDownloadSucc: Boolean
+            get() {
+                return data.getBoolean("24h_copy_download", false)
+            }
+            set(value) {
+                data.edit(commit = true) { putBoolean("24h_copy_download", value) }
             }
     }
 }
