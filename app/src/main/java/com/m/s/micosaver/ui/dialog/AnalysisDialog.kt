@@ -41,7 +41,8 @@ class AnalysisDialog (
     private val activity: BaseActivity,
     private val isValidUrl: Boolean,
     private val fromParse: ParamsHelper.FromParse,
-    private val parseUrl: String?
+    private val parseUrl: String?,
+    private val firstDownloadType: Int = -1
 ) : BaseDialog1(activity, false) {
 
     private val mBinding by lazy { MsDialogAnalysisBinding.inflate(layoutInflater) }
@@ -90,7 +91,7 @@ class AnalysisDialog (
                 }
                 showFullScreen(AdHelper.Position.DOWNLOAD_INTERS) {
                     dismiss()
-                    savingVideoInfo!!.startDownload()
+                    savingVideoInfo!!.startDownload(firstDownloadType)
                     context.startActivity(Intent(context, MainActivity::class.java).apply {
                         putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.SAVING.type)
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
