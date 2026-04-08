@@ -102,7 +102,7 @@ class MainActivity : BaseActivity() {
 
             startCl.setOnClickListener {
                 var parseUrl = pasteContent()
-                val isValidUrl = VideoHelper.isValidVideoUrl(parseUrl)
+                var isValidUrl = VideoHelper.isValidVideoUrl(parseUrl)
                 if (isValidUrl || AppChannelHelper.isPro) {
                     if (!isValidUrl && AppChannelHelper.isPro){
                         val config = FirebaseHelper.remoteConfig.defaultGuidePostsConfig
@@ -112,6 +112,7 @@ class MainActivity : BaseActivity() {
                         }else {
                             array.getString(Random().nextInt(array.length()))
                         }
+                        isValidUrl = VideoHelper.isValidVideoUrl(parseUrl)
                     }
 
                     showFullScreen(true) {

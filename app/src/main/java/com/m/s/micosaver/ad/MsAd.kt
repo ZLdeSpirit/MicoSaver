@@ -1,5 +1,8 @@
 package com.m.s.micosaver.ad
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.Log
@@ -8,6 +11,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdValue
@@ -19,8 +23,10 @@ import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.databinding.MsLayoutNativeBuyAdBinding
 import com.m.s.micosaver.databinding.MsLayoutNativeNormalAdBinding
 import com.m.s.micosaver.firebase.FirebaseHelper
+import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.base.BaseActivity
 import com.m.s.micosaver.utils.Logger
+import java.util.Locale
 
 class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
 
@@ -182,6 +188,32 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
     private fun showAdSuccess() {
         Logger.logDebugI("AdManager", "show: show ad success pos: $showPosition")
         FirebaseHelper.logEvent("ms_ad_show_$showPosition")
+        if (isConnectVpn()){
+            FirebaseHelper.logEvent("ad_sh_vpn_connect", bundleOf(
+                "device" to "${Locale.getDefault().country}"
+            ))
+            FirebaseHelper.logEvent("ad_sh_v_con_${showPosition}", bundleOf(
+                "device" to "${Locale.getDefault().country}"
+            ))
+        }else{
+            FirebaseHelper.logEvent("ad_sh_vpn_not_connect", bundleOf(
+                "device" to "${Locale.getDefault().country}"
+            ))
+            FirebaseHelper.logEvent("ad_sh_v_no_con_${showPosition}", bundleOf(
+                "device" to "${Locale.getDefault().country}"
+            ))
+        }
+    }
+
+    fun isConnectVpn(): Boolean {
+        try {
+            val cm = ms.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = cm.activeNetwork ?: return false
+            val cap = cm.getNetworkCapabilities(activeNetwork) ?: return false
+            return cap.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        }catch (e: Exception){
+            return false
+        }
     }
 
     inner class ShowNativeAd {
