@@ -26,8 +26,8 @@ android {
         applicationId = "com.mico.saver.videokeeper"
         minSdk = 24
         targetSdk = 36
-        versionCode = 105
-        versionName = "1.0.5"
+        versionCode = 106
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", "${rootProject.name}-v${versionName}-${versionCode}")
