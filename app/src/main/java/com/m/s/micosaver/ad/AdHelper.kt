@@ -486,6 +486,9 @@ object AdHelper {
                     MsDataBase.database.proAdValueDao().insert(proAdValue)
                 }
             }
+            val precisionType = adValue.precisionType
+            FirebaseHelper.logEvent("adval_preci_${precisionType}")
+            FirebaseHelper.logEvent("adval_preci_${position}_${precisionType}")
         }
 
         fun uploadAdValueToReyun(value: MsAdValue): Boolean {
