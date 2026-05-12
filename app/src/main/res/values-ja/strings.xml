@@ -152,4 +152,8 @@
     <string name="ms_msg_act1978">点火</string>
     <string name="ms_msg_desc1979">🔥 意志の低速燃焼、🔥 かき立てて火と化せ！</string>
     <string name="ms_msg_act1979">火</string>
+
+    <string name="vpn_detected">VPNが検出されました</string>
+    <string name="vpn_detected_desc">中断を避けるために、VPNを切断してください。ダウンロードには影響しません。</string>
+    <string name="closed">閉じた</string>
 </resources>

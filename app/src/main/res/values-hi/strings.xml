@@ -152,4 +152,8 @@
     <string name="ms_msg_act1978">प्रज्वलित करें</string>
     <string name="ms_msg_desc1979">🔥 इच्छा की धीमी ज्वाला, 🔥 आग के लिए हवा दें!</string>
     <string name="ms_msg_act1979">आग</string>
+
+    <string name="vpn_detected">VPN का पता चला</string>
+    <string name="vpn_detected_desc">व्यवधानों से बचने के लिए, कृपया VPN को डिस्कनेक्ट करें। डाउनलोड प्रभावित नहीं होंगे।</string>
+    <string name="closed">बंद किया</string>
 </resources>

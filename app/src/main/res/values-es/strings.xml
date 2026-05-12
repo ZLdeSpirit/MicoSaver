@@ -152,4 +152,8 @@
     <string name="ms_msg_act1978">Encender</string>
     <string name="ms_msg_desc1979">🔥 Ardor lento de la voluntad, 🔥 ¡aviva para incendiar!</string>
     <string name="ms_msg_act1979">Fuego</string>
+
+    <string name="vpn_detected">VPN Detectada</string>
+    <string name="vpn_detected_desc">Para evitar interrupciones, desconecta la VPN. Las descargas no se verán afectadas.</string>
+    <string name="closed">Cerrado</string>
 </resources>

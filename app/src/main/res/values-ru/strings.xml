@@ -152,4 +152,8 @@
     <string name="ms_msg_act1978">Воспламенить</string>
     <string name="ms_msg_desc1979">🔥 Медленное горение воли, 🔥 раздуй, чтобы зажечь!</string>
     <string name="ms_msg_act1979">Огонь</string>
+
+    <string name="vpn_detected">VPN обнаружен</string>
+    <string name="vpn_detected_desc">Чтобы избежать сбоев, отключите VPN. Загрузка не пострадает.</string>
+    <string name="closed">Закрыто</string>
 </resources>

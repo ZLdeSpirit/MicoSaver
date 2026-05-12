@@ -153,4 +153,8 @@
     <string name="ms_msg_act1978">Enflammer</string>
     <string name="ms_msg_desc1979">🔥 Brûlure lente de la volonté, 🔥 attisez pour enflammer !</string>
     <string name="ms_msg_act1979">Feu</string>
+
+    <string name="vpn_detected">VPN détectée</string>
+    <string name="vpn_detected_desc">Pour éviter les perturbations, veuillez déconnecter le VPN. Les téléchargements ne seront pas affectés.</string>
+    <string name="closed">Fermé</string>
 </resources>

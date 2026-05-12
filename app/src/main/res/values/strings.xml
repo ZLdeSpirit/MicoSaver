@@ -157,4 +157,9 @@
     <string name="ms_msg_act1978">Ignite</string>
     <string name="ms_msg_desc1979">🔥 Slow burn of want, 🔥 stoke to fire!</string>
     <string name="ms_msg_act1979">Fire</string>
+
+    <string name="vpn_detected">VPN Detected</string>
+    <string name="vpn_detected_desc">To avoid disruptions, please disconnect the VPN. Downloads
+        won\'t be affected.</string>
+    <string name="closed">Closed</string>
 </resources>
