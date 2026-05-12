@@ -2,7 +2,10 @@ package com.m.s.micosaver.ui.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
@@ -13,12 +16,14 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.m.s.micosaver.ad.AdHelper
+import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.databinding.MsActivitySplashBinding
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.LifecycleHelper
 import com.m.s.micosaver.helper.ParamsHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.base.BaseActivity
+import com.m.s.micosaver.ui.dialog.ConnectVpnDialog
 
 class MsSplashActivity : BaseActivity(){
     companion object {
@@ -44,12 +49,30 @@ class MsSplashActivity : BaseActivity(){
     override fun onInitView() {
         enterType = intent.getStringExtra(ParamsHelper.KEY_ENTER_TYPE)
             ?: ParamsHelper.EnterType.UNKNOWN.type
-        openMsg()
-        handleMsg()
         FirebaseHelper.logEvent("ms_welcome", Bundle().apply {
             putString("type", enterType)
         })
+        if (AppChannelHelper.isPro && isConnectVpn()) {
+            FirebaseHelper.logEvent("splash_connect_vpn")
+            // 连接了VPN，弹窗提示
+            ConnectVpnDialog(this).show()
+            return
+        }
+        FirebaseHelper.logEvent("splash_not_connect_vpn")
+        openMsg()
+        handleMsg()
         FirebaseHelper.logEvent("ms_scene_${onShowFullScreenPosition()}")
+    }
+
+    fun isConnectVpn(): Boolean {
+        try {
+            val cm = ms.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = cm.activeNetwork ?: return false
+            val cap = cm.getNetworkCapabilities(activeNetwork) ?: return false
+            return cap.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        }catch (e: Exception){
+            return false
+        }
     }
 
     @SuppressLint("InlinedApi")

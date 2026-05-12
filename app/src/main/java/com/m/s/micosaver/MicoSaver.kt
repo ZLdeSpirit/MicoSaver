@@ -439,5 +439,37 @@ class MicoSaver : Application(){
             set(value) {
                 data.edit(commit = true) { putBoolean("24h_copy_download", value) }
             }
+
+        fun getAdShowTimeStamp(): Long {
+            return data.getLong("ad_show_time_stamp", 0L)
+        }
+
+        fun setAdShowTimeStamp(timeStamp: Long) {
+            data.edit(commit = true) { putLong("ad_show_time_stamp", timeStamp) }
+        }
+
+        fun getAdClickTimeStamp(): Long {
+            return data.getLong("ad_click_time_stamp", 0L)
+        }
+
+        fun setAdClickTimeStamp(timeStamp: Long) {
+            data.edit(commit = true) { putLong("ad_click_time_stamp", timeStamp) }
+        }
+
+        fun getAdShowCount(): Int {
+            return data.getInt("ad_show_count", 0)
+        }
+
+        fun setAdShowCount(count: Int) {
+            data.edit(commit = true) { putInt("ad_show_count", count) }
+        }
+
+        fun getAdClickCount(): Int{
+            return data.getInt("ad_click_count", 0)
+        }
+
+        fun setAdClickCount(count: Int){
+            data.edit(commit = true) { putInt("ad_click_count", count) }
+        }
     }
 }

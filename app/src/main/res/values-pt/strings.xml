@@ -152,4 +152,8 @@
     <string name="ms_msg_act1978">Incendiar</string>
     <string name="ms_msg_desc1979">🔥 Queima lenta da vontade, 🔥 atiçar para incendiar!</string>
     <string name="ms_msg_act1979">Fogo</string>
+
+    <string name="vpn_detected">VPN Detectada</string>
+    <string name="vpn_detected_desc">Para evitar interrupções, desconecte a VPN. Os downloads não serão afetados.</string>
+    <string name="closed">Fechado</string>
 </resources>

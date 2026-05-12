@@ -174,6 +174,41 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
         showPosition?.let {
             FirebaseHelper.logEvent("ms_ad_click_$it")
         }
+        adClickCountEvent()
+    }
+
+    fun adClickCountEvent(){
+        if (System.currentTimeMillis() - ms.data.getAdClickTimeStamp() > DateUtils.DAY_IN_MILLIS){
+            ms.data.setAdClickTimeStamp(System.currentTimeMillis())
+            ms.data.setAdClickCount(0)
+        }
+        var clickCount = ms.data.getAdClickCount() + 1
+        ms.data.setAdClickCount(clickCount)
+        if (clickCount % 5 == 0){
+            if (clickCount >= 50){
+                clickCount = 50
+            }
+            FirebaseHelper.logEvent("ad_click_$clickCount", bundleOf(
+                "info" to "${Locale.getDefault().country}"
+            ))
+        }
+    }
+
+    fun adShowCountEvent(){
+        if (System.currentTimeMillis() - ms.data.getAdShowTimeStamp() > DateUtils.DAY_IN_MILLIS){
+            ms.data.setAdShowTimeStamp(System.currentTimeMillis())
+            ms.data.setAdShowCount(0)
+        }
+        var showCount = ms.data.getAdShowCount() + 1
+        ms.data.setAdShowCount(showCount)
+        if (showCount % 5 == 0){
+            if (showCount >= 50){
+                showCount = 50
+            }
+            FirebaseHelper.logEvent("ad_show_$showCount", bundleOf(
+                "info" to "${Locale.getDefault().country}"
+            ))
+        }
     }
 
     private fun callShowAd() {
@@ -203,6 +238,7 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
                 "device" to "${Locale.getDefault().country}"
             ))
         }
+        adShowCountEvent()
     }
 
     fun isConnectVpn(): Boolean {
