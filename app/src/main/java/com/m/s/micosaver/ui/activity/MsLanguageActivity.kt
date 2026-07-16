@@ -34,7 +34,8 @@ class MsLanguageActivity : BaseActivity() {
             backBtn.setOnClickListener {
                 onClose()
             }
-            okBtn.isGone = !isFirstOpen || !AppChannelHelper.isPro
+            okBtn.isGone = isFirstOpen && AppChannelHelper.isPro
+
             val adapter = LanguageAdapter {
                 selectCode = it
                 okBtn.isGone = it.isNullOrEmpty()
@@ -101,11 +102,7 @@ class MsLanguageActivity : BaseActivity() {
         private var selectCode = if (isFirstOpen && AppChannelHelper.isPro) {
             ""
         } else {
-            ms.data.languageCode
-        }
-
-        init {
-            select.invoke(selectCode)
+            ms.data.languageCode ?: "en"
         }
 
         private val languageList = ms.languageList
