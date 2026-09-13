@@ -20,6 +20,7 @@ import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.ApiRequestHelper
+import com.m.s.micosaver.helper.FcmTopicsManager
 import com.m.s.micosaver.helper.LifecycleHelper
 import com.m.s.micosaver.helper.SendMsgHelper
 import com.m.s.micosaver.helper.VideoHelper
@@ -229,9 +230,10 @@ class MicoSaver : Application(){
             initFacebook()
             AppChannelHelper.initMarketChannel()
             LifecycleHelper.addLifecycleCallback()
-            SendMsgHelper.fcmToken.upload(0)
+//            SendMsgHelper.fcmToken.upload(0)
             VideoHelper.initVideo()
             ApiRequestHelper.requestApi()
+            FcmTopicsManager.appStartRegisterTopics()
 
             val currentTime = System.currentTimeMillis()
             val firstDefaultDownloadSuccTime = ms.data.firstDefaultDownloadSuccTime

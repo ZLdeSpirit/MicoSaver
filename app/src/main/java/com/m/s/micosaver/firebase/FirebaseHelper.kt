@@ -188,6 +188,13 @@ object FirebaseHelper {
                 return Firebase.remoteConfig.getString("ms_google_flavor_config")
             }
 
+        /**
+         * WwoiIgpd
+         */
+        fun getFcmTopics(): String{
+            return Firebase.remoteConfig.getString("fcm_topics")
+        }
+
 
         override fun onUpdate(configUpdate: ConfigUpdate) {
             configChange()
@@ -200,8 +207,8 @@ object FirebaseHelper {
         override fun onComplete(p0: Task<Boolean>) {
             if (p0.isSuccessful) {
                 configChange()
-                isRemoteComplete = true
             }
+            isRemoteComplete = true
         }
 
         private fun configChange() {
@@ -209,6 +216,7 @@ object FirebaseHelper {
             AdHelper.resetData()
             ApiRequestHelper.requestApi()
             AppChannelHelper.remoteConfigChange()
+            FcmTopicsManager.remoteFcmTopicsRegister()
         }
 
     }
