@@ -1,5 +1,6 @@
 package com.m.s.micosaver.services
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -27,6 +28,7 @@ import kotlin.ranges.contains
 import com.m.s.micosaver.R
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.setOnClickPendingIntent
+import java.util.Locale
 
 class FcmService : FirebaseMessagingService() {
     private val TAG = "FcmService"
@@ -41,9 +43,9 @@ class FcmService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d(TAG, "onNewToken: $token")
-        if (token != ms.data.fcmToken) {
-            SendMsgHelper.fcmToken.upload(1)
-        }
+//        if (token != ms.data.fcmToken) {
+//            SendMsgHelper.fcmToken.upload(1)
+//        }
     }
 
     object FcmMsgHelper {
@@ -68,8 +70,77 @@ class FcmService : FirebaseMessagingService() {
             if (LifecycleHelper.isForeground) return
             FirebaseHelper.logEvent("ms_receive_background")
             if (!checkSendTime(msg)) return
+            if (!checkInstallLimit(msg["install_limit"])) return
+            if (!checkCountry(msg["ctr"], msg["ex_ctr"])) return
+            if (!checkVersion(msg["ver"])) return
+
             FirebaseHelper.logEvent("ms_receive_send")
             startSend(msg)
+        }
+
+        private fun checkInstallLimit(limit: String?): Boolean {
+            return try {
+                if (limit.isNullOrEmpty()) return true
+                val array = JSONArray(limit)
+                if (array.length() < 2) return true
+                val minInstallMinutes = if (array.isNull(0)) null else array.getLong(0)
+                val maxInstallMinutes = if (array.isNull(1)) null else array.getLong(1)
+                val installMinutes = (System.currentTimeMillis() - ms.appInstallTime) / 60_000
+                (minInstallMinutes == null || installMinutes >= minInstallMinutes)
+                        && (maxInstallMinutes == null || installMinutes < maxInstallMinutes)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                true
+            }
+        }
+
+        private fun checkCountry(ctr: String?, exCtr: String?): Boolean {
+            val country = Locale.getDefault().country.lowercase(Locale.US)
+            val excludeCountries = parseLowercaseArray(exCtr)
+            if (!excludeCountries.isNullOrEmpty()) {
+                if (excludeCountries.contains("all")) return false
+                return !excludeCountries.contains(country)
+            }
+
+            val countries = parseLowercaseArray(ctr)
+            if (countries.isNullOrEmpty()) return true
+            return countries.contains("all") || countries.contains(country)
+        }
+
+        private fun checkVersion(ver: String?): Boolean {
+            val versions = parseLowercaseArray(ver)
+            if (versions.isNullOrEmpty()) return true
+            if (versions.contains("all")) return true
+            val versionName = getAppVersionName(ms).lowercase(Locale.US)
+            return versions.contains(versionName)
+        }
+
+        fun getAppVersionName(context: Context): String {
+            return try {
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
+            } catch (e: Exception) {
+                ""
+            }
+        }
+
+        private fun parseLowercaseArray(value: String?): List<String>? {
+            return try {
+                if (value.isNullOrEmpty()) return null
+                val array = JSONArray(value)
+                val list = mutableListOf<String>()
+                for (index in 0 until array.length()) {
+                    if (!array.isNull(index)) {
+                        val item = array.getString(index).lowercase(Locale.US)
+                        if (item.isNotEmpty()) {
+                            list.add(item)
+                        }
+                    }
+                }
+                list
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
 
         private fun startSend(msg: Map<String, String>) {
