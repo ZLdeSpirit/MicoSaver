@@ -2,15 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="48dp"
     android:gravity="center"
-    android:background="#051A2E"
     android:id="@+id/downloadingContainer">
 
     <ImageView
         android:id="@+id/downloadingImageIv"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="4dp"
         android:background="@color/ms_c_default_image"
         android:scaleType="centerCrop"
@@ -28,8 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="2"
-            android:textColor="@color/white"
+            android:maxLines="1"
+            android:textColor="#02131B"
             android:textSize="14sp" />
 
         <ProgressBar
@@ -38,7 +37,7 @@
             android:layout_height="4dp"
             android:progressDrawable="@drawable/ms_downloading_progress"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_marginTop="12dp"/>
+            android:layout_marginTop="6dp"/>
 
     </LinearLayout>
 
@@ -48,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12dp"
         android:gravity="center"
-        android:textColor="@color/white"
+        android:textColor="#02131B"
         android:textSize="14sp"
         android:textStyle="bold"/>
 

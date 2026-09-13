@@ -280,7 +280,9 @@ class SavingVideoInfo(
                 msgId,
                 if (isFinish) SendMsgHelper.MsgType.DEFAULT else SendMsgHelper.MsgType.NO_CANCEL,
                 remoteViews,
-                null
+                null,
+                null,
+                videoDesc,
             )
             if (isFinish) {
                 msgBitmap?.recycle()

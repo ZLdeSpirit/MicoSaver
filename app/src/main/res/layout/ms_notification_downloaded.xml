@@ -2,15 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="48dp"
     android:gravity="center"
-    android:background="#051A2E"
     android:id="@+id/downloadedContainer">
 
     <ImageView
         android:id="@+id/downloadedImageIv"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="4dp"
         android:background="@color/ms_c_default_image"
         android:scaleType="centerCrop"
@@ -28,8 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="2"
-            android:textColor="@color/white"
+            android:maxLines="1"
+            android:textColor="#02131B"
             android:textSize="14sp" />
 
         <TextView
@@ -38,7 +37,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/white"
+            android:textColor="#02131B"
             android:textSize="12sp"
             android:layout_marginTop="12dp"/>
 

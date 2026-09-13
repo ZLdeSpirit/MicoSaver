@@ -35,7 +35,6 @@ import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
-import kotlin.compareTo
 import kotlin.math.abs
 
 object SendMsgHelper {
@@ -59,11 +58,11 @@ object SendMsgHelper {
         }
     }
 
-    fun sendMsg(msgId: Int, msgType: MsgType, view1: RemoteViews, view2: RemoteViews?) {
+    fun sendMsg(msgId: Int, msgType: MsgType, smallLayout: RemoteViews, mediumLayout: RemoteViews?,bigLayout: RemoteViews?, alertText: String) {
         val manager = NotificationManagerCompat.from(ms)
         try {
             setMsgChannel(manager, msgId, msgType)
-            manager.notify(msgId, createNotification(msgId, msgType, view1, view2))
+            manager.notify(msgId, createNotification(msgId, msgType, smallLayout, mediumLayout, bigLayout))
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -72,11 +71,28 @@ object SendMsgHelper {
     private fun createNotification(
         msgId: Int,
         msgType: MsgType,
-        view1: RemoteViews,
-        view2: RemoteViews?
+        small: RemoteViews,
+        medium: RemoteViews?,
+        big: RemoteViews?,
+        alertText: String,
     ): Notification {
+        val display = big ?: small
+        val headsUp = medium ?: small
+
         val builder = NotificationCompat.Builder(ms, "ms_channel_$msgId")
         builder.setSmallIcon(R.mipmap.ms_ic_launcher)
+        builder.setContentTitle(ms.getString(R.string.ms_app_name))
+        builder.setContentText(alertText)
+        builder.setTicker(alertText)
+
+        builder.setContent(small)
+        builder.setCustomContentView(small)
+        builder.setCustomHeadsUpContentView(headsUp)
+        builder.setCustomBigContentView(display)
+        builder.setPriority(NotificationCompat.PRIORITY_MAX)
+        builder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
         builder.setAutoCancel(msgType != MsgType.NO_CANCEL)
         builder.setOngoing(false)
         builder.setGroupSummary(false)
@@ -89,15 +105,6 @@ object SendMsgHelper {
             builder.setVibrate(longArrayOf(0, 1000))
             builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
         }
-        if (view2 != null) {
-            builder.setCustomBigContentView(view2)
-            builder.setCustomHeadsUpContentView(view2)
-        } else {
-            builder.setCustomBigContentView(view1)
-            builder.setCustomHeadsUpContentView(view1)
-        }
-        builder.setContent(view1)
-        builder.setCustomContentView(view1)
         return builder.build()
     }
 
