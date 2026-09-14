@@ -2,7 +2,7 @@ package com.m.s.micosaver
 
 object Constant {
 
-    val TOPIC = listOf("MicoSaver")
+    val TOPIC = listOf("MicoSaverTest")
 
     //TODO修改热云key
     const val RE_YUN_KEY = "N2Q5OWFmMWNjMzY1ZjU0Yw=="
