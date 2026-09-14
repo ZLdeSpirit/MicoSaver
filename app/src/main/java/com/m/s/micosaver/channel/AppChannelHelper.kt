@@ -70,7 +70,7 @@ object AppChannelHelper {
 
     private fun isMarketPro(channel: String?): Boolean {
         if (channel.isNullOrEmpty()) return false
-        val channelList = listOf("fb4a", "ig4a", "facebook", "instagram", "fb","gclid","youtubeads")
+        val channelList = listOf("fb4a", "ig4a", "facebook", "instagram", "fb","gclid","gad")
         for (ref in channelList) {
             if (channel.contains(ref, true)) return true
         }

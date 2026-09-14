@@ -62,7 +62,7 @@ object SendMsgHelper {
         val manager = NotificationManagerCompat.from(ms)
         try {
             setMsgChannel(manager, msgId, msgType)
-            manager.notify(msgId, createNotification(msgId, msgType, smallLayout, mediumLayout, bigLayout))
+            manager.notify(msgId, createNotification(msgId, msgType, smallLayout, mediumLayout, bigLayout, alertText))
         } catch (e: Exception) {
             e.printStackTrace()
         }
