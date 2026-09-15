@@ -156,4 +156,6 @@
     <string name="vpn_detected">VPN 감지됨</string>
     <string name="vpn_detected_desc">중단을 방지하려면 VPN을 연결 해제하세요. 다운로드에는 영향이 없습니다.</string>
     <string name="closed">닫힘</string>
+
+    <string name="notice_input_tip">동영상 링크를 입력하세요</string>
 </resources>

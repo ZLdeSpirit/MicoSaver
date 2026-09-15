@@ -24,6 +24,7 @@ import com.m.s.micosaver.helper.ParamsHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.base.BaseActivity
 import com.m.s.micosaver.ui.dialog.ConnectVpnDialog
+import com.m.s.micosaver.utils.Tools
 
 class MsSplashActivity : BaseActivity(){
     companion object {
@@ -185,6 +186,12 @@ class MsSplashActivity : BaseActivity(){
     }
 
     private fun startUmp() {
+        if (ms.isOpenMsg){
+            mBinding.root.postDelayed({
+                Tools.startForegroundService()
+            },500)
+        }
+
         if (!isNeedUmp) {
             waitRemoteConfig()
         } else {

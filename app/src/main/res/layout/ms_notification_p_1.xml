@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:orientation="horizontal"
+    android:id="@+id/notificationContainer"
+    android:gravity="center_vertical"
+    >
+
+    <ImageView
+        android:id="@+id/notificationIv"
+        android:layout_width="272dp"
+        android:layout_height="44dp"
+        android:src="@drawable/ms_ic_notice_p_1"
+        android:layout_marginStart="4dp"
+        />
+
+    <TextView
+        android:layout_width="0px"
+        android:layout_height="1px"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/viewBtn"
+        android:layout_width="68dp"
+        android:layout_height="32dp"
+        android:gravity="center"
+        android:textColor="#1E1E1E"
+        android:textStyle="bold"
+        android:text="@string/ms_view"
+        android:textSize="12sp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/ms_btn_type_2"/>
+</LinearLayout>

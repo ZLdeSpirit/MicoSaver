@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:autoStart="true"
+    android:flipInterval="25">
+
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00000" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00001" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00002" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00003" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00004" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00005" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00006" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00007" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00008" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00009" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00010" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00011" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00012" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00013" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00014" />
+    <ImageView style="@style/MsNotificationAnimationFrame" android:src="@drawable/small_00015" />
+</ViewFlipper>

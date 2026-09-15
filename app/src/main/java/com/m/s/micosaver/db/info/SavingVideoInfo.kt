@@ -296,7 +296,7 @@ class SavingVideoInfo(
         private fun createSavingRemoteViews(intent: Intent): RemoteViews {
             val remoteViews = RemoteViews(ms.packageName, R.layout.ms_notification_downloading)
             remoteViews.setTextViewText(R.id.downloadingDescTv, videoDesc)
-            remoteViews.setTextViewText(R.id.viewBtn, ms.getString(R.string.ms_view))
+            remoteViews.setTextViewText(R.id.actionBtnText, ms.getString(R.string.ms_view))
             val progress = progress
             remoteViews.setProgressBar(R.id.downloadingProgressBar, 100, progress, false)
             remoteViews.setTextViewText(R.id.downloadingProgressTv, "$progress%")
@@ -313,7 +313,7 @@ class SavingVideoInfo(
             remoteViews.setTextViewText(R.id.downloadedDescTv, videoDesc)
             val author = authorName.ifEmpty { ms.getString(R.string.ms_unknown) }
             remoteViews.setTextViewText(R.id.authorTv, author)
-            remoteViews.setTextViewText(R.id.playBtn, ms.getString(R.string.ms_play))
+            remoteViews.setTextViewText(R.id.actionBtnText, ms.getString(R.string.ms_play))
             if (msgBitmap != null && msgBitmap?.isRecycled != true) {
                 remoteViews.setImageViewBitmap(R.id.downloadedImageIv, msgBitmap)
             }
