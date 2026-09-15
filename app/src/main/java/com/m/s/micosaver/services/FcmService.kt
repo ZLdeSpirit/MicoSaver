@@ -33,15 +33,32 @@ import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.setOnClickPendingIntent
 import com.m.s.micosaver.utils.Tools
 import java.util.Locale
+import kotlin.text.toInt
 
 class FcmService : FirebaseMessagingService() {
     private val TAG = "FcmService"
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Log.d(TAG, "onMessageReceived: ${message.data}")
+        val data = message.data
+        Log.d(TAG, "onMessageReceived: ${data}")
         FirebaseHelper.logEvent("ms_receive_msg")
-        FcmMsgHelper.sendMsg(message.data)
+
+        val fcmType = (data["msg_type"] ?: "0").toInt()
+        when(fcmType){
+            0 ->{//视频
+                Log.i(TAG, "receive video message")
+                FcmMsgHelper.sendMsg(data)
+            }
+            1 ->{
+                Log.i(TAG, "receive permanent message")
+                if (AppChannelHelper.isPro) {
+                    FirebaseHelper.logEvent("fcm_message_send_permanent_notice")
+                    Tools.startForegroundService()
+                }
+            }
+        }
+
     }
 
     override fun onNewToken(token: String) {
@@ -208,14 +225,13 @@ class FcmService : FirebaseMessagingService() {
                     )
                     mediumLayout.setImageViewBitmap(R.id.imageIv, coverBitmap)
                     mediumLayout.setTextViewText(R.id.titleTv, desc)
-                    mediumLayout.setTextViewText(R.id.actionBtn, button)
+                    mediumLayout.setTextViewText(R.id.actionBtnText, button)
                     mediumLayout.setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
 
                     val bigLayout = RemoteViews(ms.packageName, R.layout.ms_notification_big)
                     bigLayout.setImageViewBitmap(R.id.imageIv, coverBitmap)
                     bigLayout.setTextViewText(R.id.titleTv, desc)
-                    bigLayout.setTextViewText(R.id.actionBtn, button)
-
+                    bigLayout.setTextViewText(R.id.actionBtnText, button)
                     bigLayout.setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
 
                     SendMsgHelper.sendMsg(

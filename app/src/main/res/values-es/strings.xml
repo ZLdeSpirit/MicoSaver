@@ -156,4 +156,6 @@
     <string name="vpn_detected">VPN Detectada</string>
     <string name="vpn_detected_desc">Para evitar interrupciones, desconecta la VPN. Las descargas no se verán afectadas.</string>
     <string name="closed">Cerrado</string>
+
+    <string name="notice_input_tip">Introduce el enlace del video aquí</string>
 </resources>

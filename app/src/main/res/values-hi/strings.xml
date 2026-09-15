@@ -156,4 +156,6 @@
     <string name="vpn_detected">VPN का पता चला</string>
     <string name="vpn_detected_desc">व्यवधानों से बचने के लिए, कृपया VPN को डिस्कनेक्ट करें। डाउनलोड प्रभावित नहीं होंगे।</string>
     <string name="closed">बंद किया</string>
+
+    <string name="notice_input_tip">प्रप्त लिंक इन्टर्ट करें</string>
 </resources>

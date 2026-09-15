@@ -31,6 +31,7 @@ import com.m.s.micosaver.ui.dialog.AnalysisDialog
 import com.m.s.micosaver.ui.dialog.DownloadFinishDialog
 import com.m.s.micosaver.ui.dialog.PermissionDialog
 import com.m.s.micosaver.ui.dialog.SettingsDialog
+import com.m.s.micosaver.utils.Tools
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -132,6 +133,11 @@ class MainActivity : BaseActivity() {
         playVideoChange()
         savingVideoChange()
         openMsg {
+            if (ms.isOpenMsg){
+                mBinding.root.postDelayed({
+                    Tools.startForegroundService()
+                },500)
+            }
             checkEnterType()
         }
     }

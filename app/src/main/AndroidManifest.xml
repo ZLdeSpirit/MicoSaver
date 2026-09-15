@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
+    <!-- 常驻通知栏需要权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+
     <application
         android:name=".MicoSaver"
         android:allowBackup="true"
@@ -91,6 +95,17 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+        </service>
+
+        <service
+            android:name=".services.PermanentNoticeService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:label="@string/ms_app_name"
+            tools:ignore="ForegroundServicePermission">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="downloader" />
         </service>
 
     </application>

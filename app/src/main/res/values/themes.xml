@@ -2,10 +2,6 @@
 <resources>
 
     <style name="MS_Theme.MicoSaver" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/ms_page_color</item>
-        <item name="android:statusBarColor">@color/ms_page_color</item>
-        <item name="android:navigationBarColor">@color/ms_page_color</item>
-        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="MS_DialogTheme1">

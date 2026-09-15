@@ -162,4 +162,6 @@
     <string name="vpn_detected_desc">To avoid disruptions, please disconnect the VPN. Downloads
         won\'t be affected.</string>
     <string name="closed">Closed</string>
+
+    <string name="notice_input_tip">Enter Video Link Here</string>
 </resources>
