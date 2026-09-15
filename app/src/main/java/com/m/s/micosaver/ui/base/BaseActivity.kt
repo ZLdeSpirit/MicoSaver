@@ -46,9 +46,16 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         ms.setProLanguage(this)
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         SetPageHelper().start()
         addBackPressed()
-        setContentView(onRootView())
+        val rootView = onRootView()
+        setContentView(rootView)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
+            insets
+        }
         onInitView()
         registerReceiver()
         onCreatePreloadList()?.forEach {
