@@ -38,8 +38,14 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
 
     private var showPosition: String? = null
     private var showAdValue: AdValue? = null
+    private var hasCountedClick = false
 
     fun show(showConfig: ShowConfig) {
+        if (AdFrequencyLimiter.isLimited()) {
+            Logger.logDebugI("AdManager", "show: ad frequency limited pos: ${showConfig.position}")
+            showConfig.close?.invoke()
+            return
+        }
         when (ad) {
             is InterstitialAd -> {
                 showInters(showConfig, ad)
@@ -174,6 +180,10 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
         showPosition?.let {
             FirebaseHelper.logEvent("ms_ad_click_$it")
         }
+        if (!hasCountedClick) {
+            hasCountedClick = true
+            AdFrequencyLimiter.recordClick()
+        }
         adClickCountEvent()
     }
 
@@ -212,9 +222,6 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
     }
 
     private fun callShowAd() {
-        if (FirebaseHelper.remoteConfig.adShowPreloadEnable) {
-            AdHelper.preload1(loadAdType)
-        }
         showPosition?.let {
             FirebaseHelper.logEvent("ms_ad_call_$it")
         }
@@ -222,6 +229,7 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
 
     private fun showAdSuccess() {
         Logger.logDebugI("AdManager", "show: show ad success pos: $showPosition")
+        AdFrequencyLimiter.recordShow()
         FirebaseHelper.logEvent("ms_ad_show_$showPosition")
         if (isConnectVpn()){
             FirebaseHelper.logEvent("ad_sh_vpn_connect", bundleOf(
@@ -239,6 +247,9 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
             ))
         }
         adShowCountEvent()
+        if (FirebaseHelper.remoteConfig.adShowPreloadEnable) {
+            AdHelper.preload1(loadAdType)
+        }
     }
 
     fun isConnectVpn(): Boolean {

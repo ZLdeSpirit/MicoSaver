@@ -108,6 +108,10 @@ object FirebaseHelper {
 
                 // 是否优先展示广告价值较高的广告
                 put("ms_ad_value_pre", true)
+
+                put("ad_frequency_limit",
+//                    "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50IjoxMCwKImFkX21heF9jbGlja19jb3VudCI6NQp9")
+                    "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50Ijo1MCwKImFkX21heF9jbGlja19jb3VudCI6MjAKfQ==")
             }
         }
 
@@ -194,6 +198,13 @@ object FirebaseHelper {
          */
         fun getFcmTopics(): String{
             return Firebase.remoteConfig.getString("fcm_topics")
+        }
+
+        /**
+         * 广告频率限制
+         */
+        fun getAdFrequencyLimit(): String {
+            return Firebase.remoteConfig.getString("ad_frequency_limit")
         }
 
 
