@@ -23,6 +23,7 @@ import com.m.s.micosaver.BuildConfig
 import com.m.s.micosaver.Constant
 import com.m.s.micosaver.R
 import com.m.s.micosaver.broadcast.NotificationDismissReceiver
+import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.ex.scope
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ms
@@ -124,6 +125,28 @@ object SendMsgHelper {
         action: String,
         intent: Intent,
     ): Boolean {
+        if (!ms.isOpenMsg) {
+            if (!AppChannelHelper.isPro) {
+                MediaNoticeManager.cancelActiveIfExists("non_purchase_user")
+                Log.i(MediaNoticeManager.TAG, "sent=false reason=non_purchase_user")
+                return false
+            }
+            if (!FirebaseHelper.remoteConfig.getMediaNoticeSwitch()) {
+                MediaNoticeManager.cancelActiveIfExists("switch_off")
+                Log.i(MediaNoticeManager.TAG, "sent=false reason=switch_off")
+                return false
+            }
+            return MediaNoticeManager.send(
+                title,
+                action,
+                Intent(intent).putExtra(
+                    ParamsHelper.KEY_MSG_ID,
+                    MediaNoticeManager.NOTIFICATION_ID,
+                ),
+                resolveCircleNoticeConfig(FirebaseHelper.remoteConfig.getCircleNoticeConfig()),
+            )
+        }
+        MediaNoticeManager.cancelActiveIfExists("notification_permission_granted")
         circleTasks.remove(msgId)?.let { oldTask ->
             oldTask.job.cancel()
             Log.i(
@@ -208,6 +231,7 @@ object SendMsgHelper {
 
     fun cancelCircleNotice(msgId: Int, reason: String) {
         if (msgId <= 0) return
+        if (MediaNoticeManager.cancelIfMediaNotice(msgId, reason)) return
         val task = circleTasks.remove(msgId)
         task?.job?.cancel()
         NotificationManagerCompat.from(ms).cancel(msgId)

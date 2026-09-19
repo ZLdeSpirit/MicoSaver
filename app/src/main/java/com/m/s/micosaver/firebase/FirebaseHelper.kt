@@ -113,6 +113,7 @@ object FirebaseHelper {
 //                    "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50IjoxMCwKImFkX21heF9jbGlja19jb3VudCI6NQp9")
                     "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50Ijo1MCwKImFkX21heF9jbGlja19jb3VudCI6MjAKfQ==")
                 put("circle_notice_config","ewoiY2lyY2xlX2NvdW50IjoxNSwKImludGVydmFsX3RpbWUiOjQKfQ==")
+                put("media_notice_switch", true)
             }
         }
 
@@ -233,6 +234,11 @@ object FirebaseHelper {
                 return null
             }
         }
+
+        /**
+         * 是否开启媒体通知开关
+         */
+        fun getMediaNoticeSwitch(): Boolean = Firebase.remoteConfig.getBoolean("media_notice_switch")
 
 
         override fun onUpdate(configUpdate: ConfigUpdate) {
