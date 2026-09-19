@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.Bitmap
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
@@ -25,6 +26,7 @@ import com.m.s.micosaver.ex.scope
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.activity.MsSplashActivity
+import com.m.s.micosaver.utils.Tools
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -61,6 +63,7 @@ object SendMsgHelper {
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun sendMsg(msgId: Int, msgType: MsgType, smallLayout: RemoteViews, mediumLayout: RemoteViews?,bigLayout: RemoteViews?, alertText: String): Boolean {
         val manager = NotificationManagerCompat.from(ms)
         return try {
@@ -70,6 +73,50 @@ object SendMsgHelper {
             Log.e("SendMsgHelper", "send notification failed", e)
             false
         }
+    }
+
+    fun sendRecommendMsg(
+        msgId: Int,
+        image: Bitmap?,
+        title: String,
+        action: String,
+        intent: Intent,
+    ): Boolean {
+        val pendingIntent = PendingIntent.getActivity(
+            ms,
+            getRequestCode(),
+            intent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+        )
+        val smallLayout = RemoteViews(ms.packageName, R.layout.ms_notification_small).apply {
+            setImageViewBitmap(R.id.imageIv, image)
+            setTextViewText(R.id.titleTv, title)
+            setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
+        }
+        val mediumLayout = RemoteViews(
+            ms.packageName,
+            if (Tools.isSamsungOneUi4()) {
+                R.layout.ms_notification_sa_mediaum
+            } else {
+                R.layout.ms_notification_medium
+            }
+        ).apply {
+            setImageViewBitmap(R.id.imageIv, image)
+            setTextViewText(R.id.titleTv, title)
+            setTextViewText(R.id.actionBtnText, action)
+            setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
+        }
+        val bigLayout = RemoteViews(ms.packageName, R.layout.ms_notification_big).apply {
+            setImageViewBitmap(R.id.imageIv, image)
+            setTextViewText(R.id.titleTv, title)
+            setTextViewText(R.id.actionBtnText, action)
+            setOnClickPendingIntent(R.id.notificationContainer, pendingIntent)
+        }
+        return sendMsg(msgId, MsgType.HEIGHT, smallLayout, mediumLayout, bigLayout, title)
     }
 
     private fun createNotification(

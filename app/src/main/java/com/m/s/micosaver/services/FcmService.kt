@@ -1,6 +1,5 @@
 package com.m.s.micosaver.services
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,12 +7,10 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Base64
 import android.util.Log
-import android.widget.RemoteViews
 import androidx.core.graphics.createBitmap
 import com.bumptech.glide.Glide
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -33,7 +30,6 @@ import kotlin.ranges.contains
 import com.m.s.micosaver.R
 import com.m.s.micosaver.ad.AdFrequencyLimiter
 import com.m.s.micosaver.firebase.FirebaseHelper
-import com.m.s.micosaver.helper.setOnClickPendingIntent
 import com.m.s.micosaver.utils.Tools
 import java.util.Locale
 import kotlin.text.toInt
@@ -213,40 +209,13 @@ class FcmService : FirebaseMessagingService() {
                     val desc = ms.getString(content.first)
                     val button = ms.getString(content.second)
 
-                    val pendingIntent = makePendingIntent(intent)
-
-                    val isSa = Tools.isSamsungOneUi4()
-
-                    val smallLayout = RemoteViews(ms.packageName, R.layout.ms_notification_small)
-                    smallLayout.setImageViewBitmap(R.id.imageIv, coverBitmap)
-                    smallLayout.setTextViewText(R.id.titleTv, desc)
-                    smallLayout.setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
-
-                    val mediumLayout = RemoteViews(ms.packageName,
-                        if (isSa){
-                            R.layout.ms_notification_sa_mediaum
-                        }else
-                            R.layout.ms_notification_medium
-                    )
-                    mediumLayout.setImageViewBitmap(R.id.imageIv, coverBitmap)
-                    mediumLayout.setTextViewText(R.id.titleTv, desc)
-                    mediumLayout.setTextViewText(R.id.actionBtnText, button)
-                    mediumLayout.setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
-
-                    val bigLayout = RemoteViews(ms.packageName, R.layout.ms_notification_big)
-                    bigLayout.setImageViewBitmap(R.id.imageIv, coverBitmap)
-                    bigLayout.setTextViewText(R.id.titleTv, desc)
-                    bigLayout.setTextViewText(R.id.actionBtnText, button)
-                    bigLayout.setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
-
                     if (!canSendVideoNotification()) return@withContext
-                    val isSent = SendMsgHelper.sendMsg(
+                    val isSent = SendMsgHelper.sendRecommendMsg(
                         msgId,
-                        SendMsgHelper.MsgType.HEIGHT,
-                        smallLayout,
-                        mediumLayout,
-                        bigLayout,
-                        desc
+                        coverBitmap,
+                        desc,
+                        button,
+                        intent,
                     )
                     if (isSent) {
                         FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
@@ -257,17 +226,6 @@ class FcmService : FirebaseMessagingService() {
                     }
                 }
             }
-        }
-
-        fun makePendingIntent(intent: Intent): PendingIntent {
-            val pendingIntent = PendingIntent.getActivity(
-                ms, SendMsgHelper.getRequestCode(), intent, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                } else {
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                }
-            )
-            return pendingIntent
         }
 
         private fun createCoverBitmap(coverUrl: String): Bitmap? {

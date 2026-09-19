@@ -25,6 +25,7 @@ import com.m.s.micosaver.helper.FcmTopicsManager
 import com.m.s.micosaver.helper.LifecycleHelper
 import com.m.s.micosaver.helper.RecommendManager
 import com.m.s.micosaver.helper.SendMsgHelper
+import com.m.s.micosaver.helper.SceneNotificationManager
 import com.m.s.micosaver.helper.VideoHelper
 import java.io.File
 import java.util.Locale
@@ -233,6 +234,7 @@ class MicoSaver : Application(){
             initFacebook()
             AppChannelHelper.initMarketChannel()
             LifecycleHelper.addLifecycleCallback()
+            SceneNotificationManager.init()
 //            SendMsgHelper.fcmToken.upload(0)
             VideoHelper.initVideo()
             RecommendManager.getPurchaseUserFunList{}

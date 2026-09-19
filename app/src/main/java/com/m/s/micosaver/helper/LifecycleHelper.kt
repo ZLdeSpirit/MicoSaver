@@ -76,6 +76,7 @@ object LifecycleHelper {
         override fun onActivityStopped(activity: Activity) {
             if (--visibilityCount == 0) {
                 AdHelper.preload(AdHelper.Position.WELCOME)
+                SceneNotificationManager.onAppBackgrounded()
             }
         }
 
