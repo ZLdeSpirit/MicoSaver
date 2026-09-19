@@ -9,16 +9,12 @@
 
     <ImageView
         android:id="@+id/notificationIv"
-        android:layout_width="272dp"
+        android:layout_width="0px"
         android:layout_height="44dp"
+        android:layout_weight="1"
         android:src="@drawable/ms_ic_notice_p_1"
         android:layout_marginStart="4dp"
         />
-
-    <TextView
-        android:layout_width="0px"
-        android:layout_height="1px"
-        android:layout_weight="1"/>
 
     <TextView
         android:id="@+id/viewBtn"

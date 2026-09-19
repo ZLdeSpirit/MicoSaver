@@ -224,6 +224,7 @@ class MicoSaver : Application(){
 
         fun init() {
             setProLanguage(this@MicoSaver)
+            SendMsgHelper.createNotificationChannels()
             setOpenAppTime()
             FirebaseHelper.initFirebase()
             AdHelper.initAd()

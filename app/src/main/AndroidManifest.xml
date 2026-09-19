@@ -37,6 +37,10 @@
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
             android:value="true" />
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="ms_fcm_heads_up_v2" />
+
         <activity android:name=".ui.activity.MsSplashActivity"
             android:exported="true"
             android:screenOrientation="behind"
