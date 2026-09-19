@@ -126,27 +126,27 @@ class MsSplashActivity : BaseActivity(){
                 finish()
                 return@showSplashAd
             }
-//            startActivity(
-//                Intent(
-//                    this, if (ms.data.isFirstOpen) {
-//                        MsLanguageActivity::class.java
-//                    } else {
-//                        MainActivity::class.java
-//                    }
-//                ).apply {
-//                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//                    intent.extras?.let {
-//                        putExtras(it)
-//                    }
-//                    if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain") {
-//                        putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.SHARE.type)
-//                        putExtra(
-//                            ParamsHelper.KEY_PARSE_URL,
-//                            intent.getStringExtra(Intent.EXTRA_TEXT)
-//                        )
-//                    }
-//                })
-//            finish()
+            startActivity(
+                Intent(
+                    this, if (ms.data.isFirstOpen) {
+                        MsLanguageActivity::class.java
+                    } else {
+                        MainActivity::class.java
+                    }
+                ).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    intent.extras?.let {
+                        putExtras(it)
+                    }
+                    if (intent.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+                        putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.SHARE.type)
+                        putExtra(
+                            ParamsHelper.KEY_PARSE_URL,
+                            intent.getStringExtra(Intent.EXTRA_TEXT)
+                        )
+                    }
+                })
+            finish()
         }
     }
 

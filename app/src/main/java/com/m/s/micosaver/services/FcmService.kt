@@ -234,7 +234,7 @@ class FcmService : FirebaseMessagingService() {
                     bigLayout.setTextViewText(R.id.actionBtnText, button)
                     bigLayout.setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
 
-                    SendMsgHelper.sendMsg(
+                    val isSent = SendMsgHelper.sendMsg(
                         msgId,
                         SendMsgHelper.MsgType.HEIGHT,
                         smallLayout,
@@ -242,9 +242,13 @@ class FcmService : FirebaseMessagingService() {
                         bigLayout,
                         desc
                     )
-                    FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
-                        putString("type", ParamsHelper.EnterType.PARSE.type)
-                    })
+                    if (isSent) {
+                        FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
+                            putString("type", ParamsHelper.EnterType.PARSE.type)
+                        })
+                    } else {
+                        logEventFail("notify_failed")
+                    }
                 }
             }
         }

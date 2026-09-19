@@ -38,6 +38,9 @@ import javax.net.ssl.X509TrustManager
 import kotlin.math.abs
 
 object SendMsgHelper {
+    private const val FCM_CHANNEL_ID = "ms_fcm_heads_up_v2"
+    private const val DOWNLOAD_CHANNEL_ID = "ms_download"
+
     private var msgId = 89493
     private var requestCode = 84300
     val fcmToken by lazy { FcmToken() }
@@ -58,13 +61,14 @@ object SendMsgHelper {
         }
     }
 
-    fun sendMsg(msgId: Int, msgType: MsgType, smallLayout: RemoteViews, mediumLayout: RemoteViews?,bigLayout: RemoteViews?, alertText: String) {
+    fun sendMsg(msgId: Int, msgType: MsgType, smallLayout: RemoteViews, mediumLayout: RemoteViews?,bigLayout: RemoteViews?, alertText: String): Boolean {
         val manager = NotificationManagerCompat.from(ms)
-        try {
-            setMsgChannel(manager, msgId, msgType)
+        return try {
             manager.notify(msgId, createNotification(msgId, msgType, smallLayout, mediumLayout, bigLayout, alertText))
+            true
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("SendMsgHelper", "send notification failed", e)
+            false
         }
     }
 
@@ -79,7 +83,7 @@ object SendMsgHelper {
         val display = big ?: small
         val headsUp = medium ?: small
 
-        val builder = NotificationCompat.Builder(ms, "ms_channel_$msgId")
+        val builder = NotificationCompat.Builder(ms, getChannelId(msgType))
         builder.setSmallIcon(R.mipmap.ms_ic_launcher)
         builder.setContentTitle(ms.getString(R.string.ms_app_name))
         builder.setContentText(alertText)
@@ -89,7 +93,10 @@ object SendMsgHelper {
         builder.setCustomContentView(small)
         builder.setCustomHeadsUpContentView(headsUp)
         builder.setCustomBigContentView(display)
-        builder.setPriority(NotificationCompat.PRIORITY_MAX)
+        builder.setPriority(
+            if (msgType == MsgType.HEIGHT) NotificationCompat.PRIORITY_MAX
+            else NotificationCompat.PRIORITY_DEFAULT
+        )
         builder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
@@ -108,31 +115,36 @@ object SendMsgHelper {
         return builder.build()
     }
 
-    private fun setMsgChannel(manager: NotificationManagerCompat, msgId: Int, msgType: MsgType) {
+    fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(
-                NotificationChannel(
-                    "ms_channel_$msgId",
-                    ms.getString(R.string.ms_app_name),
-                    if (msgType != MsgType.HEIGHT) {
-                        NotificationManager.IMPORTANCE_DEFAULT
-                    } else {
+            val manager = NotificationManagerCompat.from(ms)
+            manager.createNotificationChannels(
+                listOf(
+                    NotificationChannel(
+                        FCM_CHANNEL_ID,
+                        ms.getString(R.string.ms_app_name),
                         NotificationManager.IMPORTANCE_HIGH
-                    }
-                ).apply {
-                    if (msgType != MsgType.HEIGHT) {
-                        setSound(null, null)
-                        enableLights(false)
-                        enableVibration(false)
-                    } else {
+                    ).apply {
                         enableLights(true)
                         enableVibration(true)
                         vibrationPattern = longArrayOf(0, 1000)
-                    }
-                }
+                    },
+                    NotificationChannel(
+                        DOWNLOAD_CHANNEL_ID,
+                        ms.getString(R.string.ms_downloading),
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    ).apply {
+                        setSound(null, null)
+                        enableLights(false)
+                        enableVibration(false)
+                    },
+                )
             )
         }
     }
+
+    private fun getChannelId(msgType: MsgType): String =
+        if (msgType == MsgType.HEIGHT) FCM_CHANNEL_ID else DOWNLOAD_CHANNEL_ID
 
     enum class MsgType {
         HEIGHT,

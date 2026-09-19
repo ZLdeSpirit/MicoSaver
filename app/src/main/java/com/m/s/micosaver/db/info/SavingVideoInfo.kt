@@ -276,7 +276,7 @@ class SavingVideoInfo(
             }
             val remoteViews =
                 if (isFinish) createSavedRemoteViews(intent) else createSavingRemoteViews(intent)
-            SendMsgHelper.sendMsg(
+            val isSent = SendMsgHelper.sendMsg(
                 msgId,
                 if (isFinish) SendMsgHelper.MsgType.DEFAULT else SendMsgHelper.MsgType.NO_CANCEL,
                 remoteViews,
@@ -288,9 +288,11 @@ class SavingVideoInfo(
                 msgBitmap?.recycle()
                 msgBitmap = null
             }
-            FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
-                putString("type", enterType)
-            })
+            if (isSent) {
+                FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
+                    putString("type", enterType)
+                })
+            }
         }
 
         private fun createSavingRemoteViews(intent: Intent): RemoteViews {
