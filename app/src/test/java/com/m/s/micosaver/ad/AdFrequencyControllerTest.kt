@@ -80,4 +80,34 @@ class AdFrequencyControllerTest {
         assertEquals(100, state.showCount)
         assertEquals(100, state.clickCount)
     }
+
+    @Test
+    fun eachLimitIsReportedOnlyOncePerWindow() {
+        config = AdFrequencyConfig(maxShowCount = 1, maxClickCount = 1)
+        controller.recordShow()
+        controller.recordClick()
+
+        val firstCheck = controller.check()
+        val secondCheck = controller.check()
+
+        assertTrue(firstCheck.reportShowLimit)
+        assertTrue(firstCheck.reportClickLimit)
+        assertFalse(secondCheck.reportShowLimit)
+        assertFalse(secondCheck.reportClickLimit)
+        assertTrue(state.showLimitReported)
+        assertTrue(state.clickLimitReported)
+    }
+
+    @Test
+    fun limitReportStateResetsWithExpiredWindow() {
+        config = AdFrequencyConfig(intervalMinutes = 1, maxShowCount = 1)
+        controller.recordShow()
+        assertTrue(controller.check().reportShowLimit)
+
+        now += 60_000L
+        assertFalse(controller.check().isLimited)
+        controller.recordShow()
+
+        assertTrue(controller.check().reportShowLimit)
+    }
 }

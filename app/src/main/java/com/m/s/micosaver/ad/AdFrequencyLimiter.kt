@@ -3,6 +3,7 @@ package com.m.s.micosaver.ad
 import android.util.Base64
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ms
+import com.m.s.micosaver.utils.Logger
 import org.json.JSONObject
 
 internal data class AdFrequencyConfig(
@@ -15,6 +16,14 @@ internal data class AdFrequencyState(
     val startTime: Long = 0L,
     val showCount: Int = 0,
     val clickCount: Int = 0,
+    val showLimitReported: Boolean = false,
+    val clickLimitReported: Boolean = false,
+)
+
+internal data class AdFrequencyCheckResult(
+    val isLimited: Boolean,
+    val reportShowLimit: Boolean = false,
+    val reportClickLimit: Boolean = false,
 )
 
 internal class AdFrequencyController(
@@ -25,13 +34,34 @@ internal class AdFrequencyController(
 ) {
     @Synchronized
     fun isLimited(): Boolean {
+        return check().isLimited
+    }
+
+    @Synchronized
+    fun check(): AdFrequencyCheckResult {
         val config = configProvider()
-        if (config.intervalMinutes <= 0) return false
+        if (config.intervalMinutes <= 0) return AdFrequencyCheckResult(false)
 
         val state = activeState(config)
-        if (state.startTime <= 0L) return false
-        return (config.maxShowCount > 0 && state.showCount >= config.maxShowCount) ||
-            (config.maxClickCount > 0 && state.clickCount >= config.maxClickCount)
+        if (state.startTime <= 0L) return AdFrequencyCheckResult(false)
+
+        val showLimited = config.maxShowCount > 0 && state.showCount >= config.maxShowCount
+        val clickLimited = config.maxClickCount > 0 && state.clickCount >= config.maxClickCount
+        val reportShowLimit = showLimited && !state.showLimitReported
+        val reportClickLimit = clickLimited && !state.clickLimitReported
+        if (reportShowLimit || reportClickLimit) {
+            stateSaver(
+                state.copy(
+                    showLimitReported = state.showLimitReported || reportShowLimit,
+                    clickLimitReported = state.clickLimitReported || reportClickLimit,
+                )
+            )
+        }
+        return AdFrequencyCheckResult(
+            isLimited = showLimited || clickLimited,
+            reportShowLimit = reportShowLimit,
+            reportClickLimit = reportClickLimit,
+        )
     }
 
     @Synchronized
@@ -77,27 +107,51 @@ internal class AdFrequencyController(
 }
 
 internal object AdFrequencyLimiter {
+    private const val TAG = "AdFrequencyLimit"
+    private const val SHOW_LIMIT_EVENT = "ad_show_limit"
+    private const val CLICK_LIMIT_EVENT = "ad_click_limit"
     private val defaultConfig = AdFrequencyConfig()
 
     private val controller by lazy {
         AdFrequencyController(
             configProvider = ::getConfig,
-            stateProvider = {
-                val (startTime, showCount, clickCount) = ms.data.getAdFrequencyState()
-                AdFrequencyState(startTime, showCount, clickCount)
-            },
-            stateSaver = {
-                ms.data.setAdFrequencyState(it.startTime, it.showCount, it.clickCount)
-            },
+            stateProvider = ms.data::getAdFrequencyState,
+            stateSaver = ms.data::setAdFrequencyState,
             currentTimeProvider = System::currentTimeMillis,
         )
     }
 
-    fun isLimited(): Boolean = controller.isLimited()
+    fun isLimited(): Boolean = handleCheck("check")
 
-    fun recordShow() = controller.recordShow()
+    fun recordShow() {
+        controller.recordShow()
+        handleCheck("show")
+    }
 
-    fun recordClick() = controller.recordClick()
+    fun recordClick() {
+        controller.recordClick()
+        handleCheck("click")
+    }
+
+    private fun handleCheck(action: String): Boolean {
+        val result = controller.check()
+        if (result.reportShowLimit) FirebaseHelper.logEvent(SHOW_LIMIT_EVENT)
+        if (result.reportClickLimit) FirebaseHelper.logEvent(CLICK_LIMIT_EVENT)
+        if (action != "check" || result.isLimited) logState(action, result.isLimited)
+        return result.isLimited
+    }
+
+    private fun logState(action: String, isLimited: Boolean) {
+        val config = getConfig()
+        val state = ms.data.getAdFrequencyState()
+        Logger.logDebugI(
+            TAG,
+            "action=$action startTime=${state.startTime} " +
+                "show=${state.showCount}/${config.maxShowCount} " +
+                "click=${state.clickCount}/${config.maxClickCount} " +
+                "intervalMinutes=${config.intervalMinutes} limited=$isLimited"
+        )
+    }
 
     private fun getConfig(): AdFrequencyConfig {
         return try {

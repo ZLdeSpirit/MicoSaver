@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.text.format.DateUtils
@@ -29,6 +31,7 @@ import org.json.JSONArray
 import java.util.Calendar
 import kotlin.ranges.contains
 import com.m.s.micosaver.R
+import com.m.s.micosaver.ad.AdFrequencyLimiter
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.setOnClickPendingIntent
 import com.m.s.micosaver.utils.Tools
@@ -70,6 +73,7 @@ class FcmService : FirebaseMessagingService() {
     }
 
     object FcmMsgHelper {
+        private const val TAG = "FcmMsgHelper"
 
         private val msgIdList by lazy {
             listOf(
@@ -84,6 +88,7 @@ class FcmService : FirebaseMessagingService() {
 
         fun sendMsg(msg: Map<String, String>) {
             setAppChannel(msg)
+            if (!canSendVideoNotification()) return
             if (!ms.isOpenMsg) return
             FirebaseHelper.logEvent("ms_receive_open")
             if (!AppChannelHelper.isPro) return
@@ -234,6 +239,7 @@ class FcmService : FirebaseMessagingService() {
                     bigLayout.setTextViewText(R.id.actionBtnText, button)
                     bigLayout.setOnClickPendingIntent(R.id.notificationRoot, pendingIntent)
 
+                    if (!canSendVideoNotification()) return@withContext
                     val isSent = SendMsgHelper.sendMsg(
                         msgId,
                         SendMsgHelper.MsgType.HEIGHT,
@@ -293,6 +299,21 @@ class FcmService : FirebaseMessagingService() {
             FirebaseHelper.logEvent("ms_send_fail", Bundle().apply {
                 putString("msg", msg)
             })
+        }
+
+        private fun canSendVideoNotification(): Boolean {
+            if (AdFrequencyLimiter.isLimited()) {
+                Log.i(TAG, "drop video notification: ad frequency limited")
+                return false
+            }
+            val connectivityManager =
+                ms.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork
+            val capabilities = network?.let(connectivityManager::getNetworkCapabilities)
+            val isAvailable = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            if (!isAvailable) Log.i(TAG, "drop video notification: network unavailable")
+            return isAvailable
         }
 
         private fun checkSendTime(msg: Map<String, String>): Boolean {

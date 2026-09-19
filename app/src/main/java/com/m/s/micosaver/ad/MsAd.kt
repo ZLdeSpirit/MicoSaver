@@ -41,7 +41,7 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
     private var hasCountedClick = false
 
     fun show(showConfig: ShowConfig) {
-        if (AdFrequencyLimiter.isLimited()) {
+        if (!showConfig.canShowAfterFrequencyLimit && AdFrequencyLimiter.isLimited()) {
             Logger.logDebugI("AdManager", "show: ad frequency limited pos: ${showConfig.position}")
             showConfig.close?.invoke()
             return
@@ -356,6 +356,9 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
         var nativeLayout: FrameLayout? = null
             private set
 
+        internal var canShowAfterFrequencyLimit = false
+            private set
+
         fun setCloseCallback(close: () -> Unit): ShowConfig {
             this.close = close
             return this
@@ -364,6 +367,10 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
         fun setNativeLayout(nativeLayout: FrameLayout): ShowConfig {
             this.nativeLayout = nativeLayout
             return this
+        }
+
+        internal fun allowShowAfterFrequencyLimit() {
+            canShowAfterFrequencyLimit = true
         }
 
     }
