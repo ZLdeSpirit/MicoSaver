@@ -15,6 +15,7 @@ import androidx.core.content.FileProvider
 import androidx.core.content.edit
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
+import com.m.s.micosaver.ad.AdFrequencyState
 import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.channel.AppChannelHelper
@@ -475,19 +476,23 @@ class MicoSaver : Application(){
             data.edit(commit = true) { putInt("ad_click_count", count) }
         }
 
-        fun getAdFrequencyState(): Triple<Long, Int, Int> {
-            return Triple(
-                data.getLong("ad_frequency_start_time", 0L),
-                data.getInt("ad_frequency_show_count", 0),
-                data.getInt("ad_frequency_click_count", 0),
+        internal fun getAdFrequencyState(): AdFrequencyState {
+            return AdFrequencyState(
+                startTime = data.getLong("ad_frequency_start_time", 0L),
+                showCount = data.getInt("ad_frequency_show_count", 0),
+                clickCount = data.getInt("ad_frequency_click_count", 0),
+                showLimitReported = data.getBoolean("ad_frequency_show_limit_reported", false),
+                clickLimitReported = data.getBoolean("ad_frequency_click_limit_reported", false),
             )
         }
 
-        fun setAdFrequencyState(startTime: Long, showCount: Int, clickCount: Int) {
+        internal fun setAdFrequencyState(state: AdFrequencyState) {
             data.edit(commit = true) {
-                putLong("ad_frequency_start_time", startTime)
-                putInt("ad_frequency_show_count", showCount)
-                putInt("ad_frequency_click_count", clickCount)
+                putLong("ad_frequency_start_time", state.startTime)
+                putInt("ad_frequency_show_count", state.showCount)
+                putInt("ad_frequency_click_count", state.clickCount)
+                putBoolean("ad_frequency_show_limit_reported", state.showLimitReported)
+                putBoolean("ad_frequency_click_limit_reported", state.clickLimitReported)
             }
         }
     }

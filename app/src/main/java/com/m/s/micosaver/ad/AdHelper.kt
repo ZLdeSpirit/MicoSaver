@@ -299,6 +299,7 @@ object AdHelper {
     ) {
         if (Position.isOpenLoading(showConfig.position)) {
             val dialog = AdLoadingDialog(showConfig.activity).showDialog()
+            showConfig.allowShowAfterFrequencyLimit()
             if (ad == null) {
                 var isTimeOut = false
                 val job = scope.launch {
