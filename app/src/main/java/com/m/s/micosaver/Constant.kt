@@ -16,4 +16,7 @@ object Constant {
 //    const val UPLOAD_TOKEN_URL = "https://api.twothreemedia.xyz/check/cok/"//RELEASE
 
     const val API_URL = "https://api.twothreemedia.xyz/check/ka/"//RELEASE
+
+    const val BASE_RECOMMEND_URL = "https://test.twothreemedia.xyz/vi/res?k=20"// test
+//    const val BASE_RECOMMEND_URL = "https://api.twothreemedia.xyz/vi/res?k=20"// release
 }
