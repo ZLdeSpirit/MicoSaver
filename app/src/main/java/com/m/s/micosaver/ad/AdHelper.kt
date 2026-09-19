@@ -183,6 +183,10 @@ object AdHelper {
 
     fun preload1(type: String) {
         Logger.logDebugI("AdManager", "preload: start preload type: $type")
+        if (AdFrequencyLimiter.isLimited()) {
+            Logger.logDebugI("AdManager", "preload: ad frequency limited type: $type")
+            return
+        }
         loadManager.preload(type)
     }
 
@@ -194,6 +198,10 @@ object AdHelper {
 
     fun preload2(position: String) {
         Logger.logDebugI("AdManager", "preload: start preload pos: $position")
+        if (AdFrequencyLimiter.isLimited()) {
+            Logger.logDebugI("AdManager", "preload: ad frequency limited pos: $position")
+            return
+        }
         if (!isPreLoadEnable(position)) {
             Logger.logDebugI("AdManager", "preload: pos is not pre load enable pos: $position")
             return
@@ -211,6 +219,11 @@ object AdHelper {
 
     fun load(position: String, callback: (MsAd?) -> Unit) {
         Logger.logDebugI("AdManager", "load: start load pos: $position")
+        if (AdFrequencyLimiter.isLimited()) {
+            Logger.logDebugI("AdManager", "load: ad frequency limited pos: $position")
+            callback.invoke(null)
+            return
+        }
         if (!isEnable(position)) {
             Logger.logDebugI("AdManager", "load: pos is not enable pos: $position")
             callback.invoke(null)
@@ -227,6 +240,11 @@ object AdHelper {
 
     fun show(showConfig: MsAd.ShowConfig) {
         Logger.logDebugI("AdManager", "show: start show pos: ${showConfig.position}")
+        if (AdFrequencyLimiter.isLimited()) {
+            Logger.logDebugI("AdManager", "show: ad frequency limited pos: ${showConfig.position}")
+            showConfig.close?.invoke()
+            return
+        }
         if (!showConfig.activity.isVisiblePage) {
             Logger.logDebugI("AdManager", "show: page is not visible pos: ${showConfig.position}")
             showConfig.close?.invoke()
@@ -249,6 +267,11 @@ object AdHelper {
 
     fun showSplashAd(showConfig: MsAd.ShowConfig) {
         Logger.logDebugI("AdManager", "show: start show pos: ${showConfig.position}")
+        if (AdFrequencyLimiter.isLimited()) {
+            Logger.logDebugI("AdManager", "show: ad frequency limited pos: ${showConfig.position}")
+            showConfig.close?.invoke()
+            return
+        }
         if (!showConfig.activity.isVisiblePage) {
             Logger.logDebugI("AdManager", "show: page is not visible pos: ${showConfig.position}")
             showConfig.close?.invoke()
@@ -655,6 +678,7 @@ object AdHelper {
                 scope.launch {
                     var ad: MsAd? = null
                     for (adId in config.adIdList) {
+                        if (AdFrequencyLimiter.isLimited()) break
                         if (maxCachePriority >= adId.priority) break
 
                         ad = loadAd(adId)

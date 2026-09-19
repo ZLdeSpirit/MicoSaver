@@ -474,5 +474,21 @@ class MicoSaver : Application(){
         fun setAdClickCount(count: Int){
             data.edit(commit = true) { putInt("ad_click_count", count) }
         }
+
+        fun getAdFrequencyState(): Triple<Long, Int, Int> {
+            return Triple(
+                data.getLong("ad_frequency_start_time", 0L),
+                data.getInt("ad_frequency_show_count", 0),
+                data.getInt("ad_frequency_click_count", 0),
+            )
+        }
+
+        fun setAdFrequencyState(startTime: Long, showCount: Int, clickCount: Int) {
+            data.edit(commit = true) {
+                putLong("ad_frequency_start_time", startTime)
+                putInt("ad_frequency_show_count", showCount)
+                putInt("ad_frequency_click_count", clickCount)
+            }
+        }
     }
 }
