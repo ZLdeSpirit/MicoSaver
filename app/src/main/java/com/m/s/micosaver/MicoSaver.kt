@@ -23,6 +23,7 @@ import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.ApiRequestHelper
 import com.m.s.micosaver.helper.FcmTopicsManager
 import com.m.s.micosaver.helper.LifecycleHelper
+import com.m.s.micosaver.helper.RecommendManager
 import com.m.s.micosaver.helper.SendMsgHelper
 import com.m.s.micosaver.helper.VideoHelper
 import java.io.File
@@ -234,6 +235,7 @@ class MicoSaver : Application(){
             LifecycleHelper.addLifecycleCallback()
 //            SendMsgHelper.fcmToken.upload(0)
             VideoHelper.initVideo()
+            RecommendManager.getPurchaseUserFunList{}
             ApiRequestHelper.requestApi()
             FcmTopicsManager.appStartRegisterTopics()
 
@@ -474,6 +476,13 @@ class MicoSaver : Application(){
 
         fun setAdClickCount(count: Int){
             data.edit(commit = true) { putInt("ad_click_count", count) }
+        }
+
+        fun setRecommendRequestTime(time: Long) {
+            data.edit(commit = true) { putLong("recommend_request_time", time) }
+        }
+        fun getRecommendRequestTime(): Long{
+            return data.getLong("recommend_request_time", 0)
         }
 
         internal fun getAdFrequencyState(): AdFrequencyState {
