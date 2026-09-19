@@ -72,13 +72,17 @@ internal object MediaNoticeManager {
             )
         }
 
-        circleTask?.job?.cancel()
-        totalCircle = resolveMediaCircleCount(ordinaryConfig)
-        currentCircle = 1
+        val previousTask = circleTask
+        val newTotalCircle = resolveMediaCircleCount(ordinaryConfig)
         val sent = notify(title, action, contentIntent, silent = false)
-        Log.i(TAG, "id=$NOTIFICATION_ID current=1 total=$totalCircle silent=false sent=$sent")
-        if (sent && totalCircle > 1) {
-            val task = MediaCircleTask(current = 1, total = totalCircle)
+        Log.i(TAG, "id=$NOTIFICATION_ID current=1 total=$newTotalCircle silent=false sent=$sent")
+        if (!sent) return false
+        previousTask?.job?.cancel()
+        totalCircle = newTotalCircle
+        currentCircle = 1
+        circleTask = null
+        if (newTotalCircle > 1) {
+            val task = MediaCircleTask(current = 1, total = newTotalCircle)
             task.job = scope.launch(start = CoroutineStart.LAZY) {
                 try {
                     for (current in 2..task.total) {
@@ -108,7 +112,7 @@ internal object MediaNoticeManager {
             circleTask = task
             task.job.start()
         }
-        return sent
+        return true
     }
 
     @Synchronized

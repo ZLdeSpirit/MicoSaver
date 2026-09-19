@@ -114,6 +114,10 @@ object FirebaseHelper {
                     "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50Ijo1MCwKImFkX21heF9jbGlja19jb3VudCI6MjAKfQ==")
                 put("circle_notice_config","ewoiY2lyY2xlX2NvdW50IjoxNSwKImludGVydmFsX3RpbWUiOjQKfQ==")
                 put("media_notice_switch", true)
+                put(
+                    "notice_interval_config",
+                    "eyJmY21fcHVzaCI6MzAwLCJ1bmxvY2siOjMwMCwiaG9tZSI6MzAwLCJiYWNrZ3JvdW5kIjozMDAsImFkX2NsaWNrIjozMDAsInJlY2VudF9hcHBzIjozMDAsIndpZmlfY2hhbmdlZCI6MzAwLCJ1c2JfY29ubmVjdGVkIjozMDAsInBvd2VyX2Nvbm5lY3RlZCI6MzAwLCJhcHBfaW5zdGFsbGVkIjozMDAsImJvb3QiOjMwMCwiZmlsZV9jaGFuZ2VkIjozMDAsInNjcmVlbnNob3QiOjMwMH0=",
+                )
             }
         }
 
@@ -239,6 +243,19 @@ object FirebaseHelper {
          * 是否开启媒体通知开关
          */
         fun getMediaNoticeSwitch(): Boolean = Firebase.remoteConfig.getBoolean("media_notice_switch")
+
+        fun getNoticeIntervalConfig(): Map<String, Long>? {
+            return try {
+                val config = Firebase.remoteConfig.getString("notice_interval_config")
+                val json = JSONObject(String(Base64.decode(config, Base64.NO_WRAP)))
+                buildMap {
+                    json.keys().forEach { key -> put(key, json.getLong(key)) }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
 
 
         override fun onUpdate(configUpdate: ConfigUpdate) {

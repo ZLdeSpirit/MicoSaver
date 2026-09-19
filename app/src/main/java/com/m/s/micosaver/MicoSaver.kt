@@ -487,6 +487,14 @@ class MicoSaver : Application(){
             return data.getLong("recommend_request_time", 0)
         }
 
+        fun getNoticeLastSentTime(scene: String): Long {
+            return data.getLong("notice_last_sent_$scene", 0L)
+        }
+
+        fun setNoticeLastSentTime(scene: String, time: Long) {
+            data.edit(commit = true) { putLong("notice_last_sent_$scene", time) }
+        }
+
         internal fun getAdFrequencyState(): AdFrequencyState {
             return AdFrequencyState(
                 startTime = data.getLong("ad_frequency_start_time", 0L),

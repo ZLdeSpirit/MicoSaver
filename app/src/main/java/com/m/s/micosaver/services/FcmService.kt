@@ -19,6 +19,7 @@ import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.ex.scope
 import com.m.s.micosaver.helper.LifecycleHelper
 import com.m.s.micosaver.helper.ParamsHelper
+import com.m.s.micosaver.helper.NotificationIntervalLimiter
 import com.m.s.micosaver.helper.SendMsgHelper
 import com.m.s.micosaver.ms
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +95,10 @@ class FcmService : FirebaseMessagingService() {
             if (!checkInstallLimit(msg["install_limit"])) return
             if (!checkCountry(msg["ctr"], msg["ex_ctr"])) return
             if (!checkVersion(msg["ver"])) return
+            if (!NotificationIntervalLimiter.canSend(NotificationIntervalLimiter.FCM_PUSH)) {
+                Log.i(TAG, "drop video notification: notice interval")
+                return
+            }
 
             FirebaseHelper.logEvent("ms_receive_send")
             startSend(msg)
@@ -209,6 +214,10 @@ class FcmService : FirebaseMessagingService() {
                     val button = ms.getString(content.second)
 
                     if (!canSendVideoNotification()) return@withContext
+                    if (!NotificationIntervalLimiter.canSend(NotificationIntervalLimiter.FCM_PUSH)) {
+                        Log.i(TAG, "drop video notification: notice interval")
+                        return@withContext
+                    }
                     val isSent = SendMsgHelper.sendRecommendMsg(
                         msgId,
                         coverBitmap,
@@ -217,6 +226,7 @@ class FcmService : FirebaseMessagingService() {
                         intent,
                     )
                     if (isSent) {
+                        NotificationIntervalLimiter.recordSent(NotificationIntervalLimiter.FCM_PUSH)
                         FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
                             putString("type", ParamsHelper.EnterType.PARSE.type)
                         })
