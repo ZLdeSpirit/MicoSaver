@@ -155,7 +155,7 @@ object SceneNotificationManager {
     }
 
     private fun send(scene: Scene) {
-        val blockedReason = blockedReason()
+        val blockedReason = blockedReason(scene)
         if (blockedReason != null) {
             Log.i(TAG, "scene=${scene.logName} sent=false reason=$blockedReason")
             return
@@ -169,7 +169,7 @@ object SceneNotificationManager {
             scope.launch {
                 val image = createCoverBitmap(recommend.cover)
                 withContext(Dispatchers.Main) {
-                    val currentBlockedReason = blockedReason()
+                    val currentBlockedReason = blockedReason(scene)
                     if (currentBlockedReason != null) {
                         Log.i(TAG, "scene=${scene.logName} sent=false reason=$currentBlockedReason")
                         return@withContext
@@ -177,6 +177,7 @@ object SceneNotificationManager {
                     val sent = sendRecommendation(recommend, image)
                     Log.i(TAG, "scene=${scene.logName} sent=$sent")
                     if (sent) {
+                        NotificationIntervalLimiter.recordSent(scene.logName)
                         FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
                             putString("type", scene.logName)
                         })
@@ -186,14 +187,19 @@ object SceneNotificationManager {
         }
     }
 
-    private fun blockedReason(): String? {
+    private fun blockedReason(scene: Scene): String? {
         if (!AppChannelHelper.isPro) return "non_purchase_user"
         if (AdFrequencyLimiter.isLimited()) return "ad_frequency_limited"
         val manager = ms.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val capabilities = manager.activeNetwork?.let(manager::getNetworkCapabilities)
         val connected = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true &&
             capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-        return if (connected) null else "network_unavailable"
+        if (!connected) return "network_unavailable"
+        return if (NotificationIntervalLimiter.canSend(scene.logName)) {
+            null
+        } else {
+            "notice_interval"
+        }
     }
 
     private fun sendRecommendation(recommend: RecommendBean, image: Bitmap?): Boolean {

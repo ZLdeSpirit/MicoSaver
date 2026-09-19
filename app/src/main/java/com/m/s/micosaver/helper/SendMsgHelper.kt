@@ -136,7 +136,7 @@ object SendMsgHelper {
                 Log.i(MediaNoticeManager.TAG, "sent=false reason=switch_off")
                 return false
             }
-            return MediaNoticeManager.send(
+            val sent = MediaNoticeManager.send(
                 title,
                 action,
                 Intent(intent).putExtra(
@@ -145,15 +145,10 @@ object SendMsgHelper {
                 ),
                 resolveCircleNoticeConfig(FirebaseHelper.remoteConfig.getCircleNoticeConfig()),
             )
+            if (sent) stopCircleNoticeLoops("replaced_by_media_notice")
+            return sent
         }
         MediaNoticeManager.cancelActiveIfExists("notification_permission_granted")
-        circleTasks.remove(msgId)?.let { oldTask ->
-            oldTask.job.cancel()
-            Log.i(
-                CIRCLE_NOTICE_TAG,
-                "id=$msgId stopped reason=replaced current=${oldTask.current} total=${oldTask.total}",
-            )
-        }
         val pendingIntent = PendingIntent.getActivity(
             ms,
             getRequestCode(),
@@ -215,6 +210,9 @@ object SendMsgHelper {
             CIRCLE_NOTICE_TAG,
             "id=$msgId current=1 total=${config.circleCount} silent=false sent=$firstSent",
         )
+        if (firstSent) {
+            stopCircleNoticeLoops("replaced_by_new_notice")
+        }
         if (firstSent && config.circleCount > 1) {
             startCircleNotice(
                 msgId,
@@ -227,6 +225,18 @@ object SendMsgHelper {
             )
         }
         return firstSent
+    }
+
+    private fun stopCircleNoticeLoops(reason: String) {
+        circleTasks.entries.toList().forEach { (id, task) ->
+            if (circleTasks.remove(id, task)) {
+                task.job.cancel()
+                Log.i(
+                    CIRCLE_NOTICE_TAG,
+                    "id=$id stopped reason=$reason current=${task.current} total=${task.total}",
+                )
+            }
+        }
     }
 
     fun cancelCircleNotice(msgId: Int, reason: String) {
