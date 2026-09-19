@@ -85,8 +85,7 @@ class FcmService : FirebaseMessagingService() {
         fun sendMsg(msg: Map<String, String>) {
             setAppChannel(msg)
             if (!canSendVideoNotification()) return
-            if (!ms.isOpenMsg) return
-            FirebaseHelper.logEvent("ms_receive_open")
+            if (ms.isOpenMsg) FirebaseHelper.logEvent("ms_receive_open")
             if (!AppChannelHelper.isPro) return
             FirebaseHelper.logEvent("ms_receive_pro")
             if (LifecycleHelper.isForeground) return

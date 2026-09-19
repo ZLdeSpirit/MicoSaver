@@ -188,7 +188,6 @@ object SceneNotificationManager {
 
     private fun blockedReason(): String? {
         if (!AppChannelHelper.isPro) return "non_purchase_user"
-        if (!ms.isOpenMsg) return "notification_permission"
         if (AdFrequencyLimiter.isLimited()) return "ad_frequency_limited"
         val manager = ms.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val capabilities = manager.activeNetwork?.let(manager::getNetworkCapabilities)

@@ -69,6 +69,8 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.media3:media3-exoplayer:1.6.0")
+    implementation("androidx.media3:media3-session:1.6.0")
 
     api("com.github.bumptech.glide:glide:4.14.2")
     annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")
