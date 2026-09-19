@@ -12,7 +12,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.NotificationManagerCompat
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.m.s.micosaver.ad.AdHelper
@@ -21,6 +20,7 @@ import com.m.s.micosaver.databinding.MsActivitySplashBinding
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.LifecycleHelper
 import com.m.s.micosaver.helper.ParamsHelper
+import com.m.s.micosaver.helper.SendMsgHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.base.BaseActivity
 import com.m.s.micosaver.ui.dialog.ConnectVpnDialog
@@ -50,6 +50,11 @@ class MsSplashActivity : BaseActivity(){
     override fun onInitView() {
         enterType = intent.getStringExtra(ParamsHelper.KEY_ENTER_TYPE)
             ?: ParamsHelper.EnterType.UNKNOWN.type
+        if (enterType == ParamsHelper.EnterType.SAVED.type ||
+            enterType == ParamsHelper.EnterType.PARSE.type
+        ) {
+            removeMsg(intent.getIntExtra(ParamsHelper.KEY_MSG_ID, -1))
+        }
         FirebaseHelper.logEvent("ms_welcome", Bundle().apply {
             putString("type", enterType)
         })
@@ -165,7 +170,6 @@ class MsSplashActivity : BaseActivity(){
                 FirebaseHelper.logEvent("ms_msg_click", Bundle().apply {
                     putString("type", enterType)
                 })
-                removeMsg(intent.getIntExtra(ParamsHelper.KEY_MSG_ID, -1))
             }
 
             ParamsHelper.EnterType.SAVING.type -> {
@@ -179,7 +183,7 @@ class MsSplashActivity : BaseActivity(){
     private fun removeMsg(msgId: Int) {
         if (msgId <= 0) return
         try {
-            NotificationManagerCompat.from(this).cancel(msgId)
+            SendMsgHelper.cancelCircleNotice(msgId, "clicked")
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -125,6 +125,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".broadcast.NotificationDismissReceiver"
+            android:exported="false" />
+
     </application>
 
 </manifest>
