@@ -23,6 +23,7 @@ import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.databinding.MsLayoutNativeBuyAdBinding
 import com.m.s.micosaver.databinding.MsLayoutNativeNormalAdBinding
 import com.m.s.micosaver.firebase.FirebaseHelper
+import com.m.s.micosaver.helper.SceneNotificationManager
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.base.BaseActivity
 import com.m.s.micosaver.utils.Logger
@@ -174,6 +175,7 @@ class MsAd(val adId: AdHelper.AdId, val ad: Any, val loadAdType: String) {
 
     fun clickAd() {
         Logger.logDebugI("AdManager", "click ad pos: $showPosition")
+        SceneNotificationManager.schedule(SceneNotificationManager.Scene.AD_CLICK, 60_000L)
         showAdValue?.let {
             AdHelper.uploadClickAdValue(it)
         }
