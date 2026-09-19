@@ -22,11 +22,15 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.m.s.micosaver.BuildConfig
 import com.m.s.micosaver.Constant
 import com.m.s.micosaver.R
+import com.m.s.micosaver.broadcast.NotificationDismissReceiver
 import com.m.s.micosaver.ex.scope
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ms
 import com.m.s.micosaver.ui.activity.MsSplashActivity
 import com.m.s.micosaver.utils.Tools
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -35,16 +39,19 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
+import java.util.concurrent.ConcurrentHashMap
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 import kotlin.math.abs
 
 object SendMsgHelper {
+    const val CIRCLE_NOTICE_TAG = "CircleNotice"
     private const val FCM_CHANNEL_ID = "ms_fcm_heads_up_v2"
     private const val DOWNLOAD_CHANNEL_ID = "ms_download"
 
     private var msgId = 89493
     private var requestCode = 84300
+    private val circleTasks = ConcurrentHashMap<Int, CircleTask>()
     val fcmToken by lazy { FcmToken() }
 
     fun getRequestCode(): Int {
@@ -65,9 +72,44 @@ object SendMsgHelper {
 
     @SuppressLint("MissingPermission")
     fun sendMsg(msgId: Int, msgType: MsgType, smallLayout: RemoteViews, mediumLayout: RemoteViews?,bigLayout: RemoteViews?, alertText: String): Boolean {
+        return sendMsg(
+            msgId,
+            msgType,
+            smallLayout,
+            mediumLayout,
+            bigLayout,
+            alertText,
+            silent = false,
+            deleteIntent = null,
+        )
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun sendMsg(
+        msgId: Int,
+        msgType: MsgType,
+        smallLayout: RemoteViews,
+        mediumLayout: RemoteViews?,
+        bigLayout: RemoteViews?,
+        alertText: String,
+        silent: Boolean,
+        deleteIntent: PendingIntent?,
+    ): Boolean {
         val manager = NotificationManagerCompat.from(ms)
         return try {
-            manager.notify(msgId, createNotification(msgId, msgType, smallLayout, mediumLayout, bigLayout, alertText))
+            manager.notify(
+                msgId,
+                createNotification(
+                    msgId,
+                    msgType,
+                    smallLayout,
+                    mediumLayout,
+                    bigLayout,
+                    alertText,
+                    silent,
+                    deleteIntent,
+                ),
+            )
             true
         } catch (e: Exception) {
             Log.e("SendMsgHelper", "send notification failed", e)
@@ -82,6 +124,13 @@ object SendMsgHelper {
         action: String,
         intent: Intent,
     ): Boolean {
+        circleTasks.remove(msgId)?.let { oldTask ->
+            oldTask.job.cancel()
+            Log.i(
+                CIRCLE_NOTICE_TAG,
+                "id=$msgId stopped reason=replaced current=${oldTask.current} total=${oldTask.total}",
+            )
+        }
         val pendingIntent = PendingIntent.getActivity(
             ms,
             getRequestCode(),
@@ -91,6 +140,18 @@ object SendMsgHelper {
             } else {
                 PendingIntent.FLAG_UPDATE_CURRENT
             }
+        )
+        val deleteIntent = PendingIntent.getBroadcast(
+            ms,
+            getRequestCode(),
+            Intent(ms, NotificationDismissReceiver::class.java).apply {
+                putExtra(ParamsHelper.KEY_MSG_ID, msgId)
+            },
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            },
         )
         val smallLayout = RemoteViews(ms.packageName, R.layout.ms_notification_small).apply {
             setImageViewBitmap(R.id.imageIv, image)
@@ -116,7 +177,85 @@ object SendMsgHelper {
             setTextViewText(R.id.actionBtnText, action)
             setOnClickPendingIntent(R.id.notificationContainer, pendingIntent)
         }
-        return sendMsg(msgId, MsgType.HEIGHT, smallLayout, mediumLayout, bigLayout, title)
+        val config = resolveCircleNoticeConfig(FirebaseHelper.remoteConfig.getCircleNoticeConfig())
+        val firstSent = sendMsg(
+            msgId,
+            MsgType.HEIGHT,
+            smallLayout,
+            mediumLayout,
+            bigLayout,
+            title,
+            silent = false,
+            deleteIntent = deleteIntent,
+        )
+        Log.i(
+            CIRCLE_NOTICE_TAG,
+            "id=$msgId current=1 total=${config.circleCount} silent=false sent=$firstSent",
+        )
+        if (firstSent && config.circleCount > 1) {
+            startCircleNotice(
+                msgId,
+                config,
+                smallLayout,
+                mediumLayout,
+                bigLayout,
+                title,
+                deleteIntent,
+            )
+        }
+        return firstSent
+    }
+
+    fun cancelCircleNotice(msgId: Int, reason: String) {
+        if (msgId <= 0) return
+        val task = circleTasks.remove(msgId)
+        task?.job?.cancel()
+        NotificationManagerCompat.from(ms).cancel(msgId)
+        Log.i(
+            CIRCLE_NOTICE_TAG,
+            "id=$msgId stopped reason=$reason current=${task?.current ?: "finished"} " +
+                "total=${task?.total ?: "finished"}",
+        )
+    }
+
+    private fun startCircleNotice(
+        msgId: Int,
+        config: CircleNoticeConfig,
+        smallLayout: RemoteViews,
+        mediumLayout: RemoteViews?,
+        bigLayout: RemoteViews,
+        title: String,
+        deleteIntent: PendingIntent,
+    ) {
+        val task = CircleTask(current = 1, total = config.circleCount)
+        task.job = scope.launch(start = CoroutineStart.LAZY) {
+            try {
+                for (current in 2..config.circleCount) {
+                    delay(config.intervalMillis)
+                    task.current = current
+                    val sent = sendMsg(
+                        msgId,
+                        MsgType.HEIGHT,
+                        smallLayout,
+                        mediumLayout,
+                        bigLayout,
+                        title,
+                        silent = true,
+                        deleteIntent = deleteIntent,
+                    )
+                    Log.i(
+                        CIRCLE_NOTICE_TAG,
+                        "id=$msgId current=$current total=${config.circleCount} " +
+                            "silent=true sent=$sent",
+                    )
+                    if (!sent) break
+                }
+            } finally {
+                circleTasks.remove(msgId, task)
+            }
+        }
+        circleTasks.put(msgId, task)?.job?.cancel()
+        task.job.start()
     }
 
     private fun createNotification(
@@ -126,6 +265,8 @@ object SendMsgHelper {
         medium: RemoteViews?,
         big: RemoteViews?,
         alertText: String,
+        silent: Boolean = false,
+        deleteIntent: PendingIntent? = null,
     ): Notification {
         val display = big ?: small
         val headsUp = medium ?: small
@@ -146,14 +287,19 @@ object SendMsgHelper {
         )
         builder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        deleteIntent?.let {
+            builder.setOnlyAlertOnce(true)
+            builder.setDeleteIntent(it)
+        }
 
         builder.setAutoCancel(msgType != MsgType.NO_CANCEL)
         builder.setOngoing(false)
         builder.setGroupSummary(false)
         builder.setGroup("ms_group_$msgId")
-        if (msgType != MsgType.HEIGHT) {
+        if (msgType != MsgType.HEIGHT || silent) {
             builder.setVibrate(null)
             builder.setSound(null)
+            if (silent) builder.setSilent(true)
         } else {
             builder.setStyle(NotificationCompat.BigPictureStyle())
             builder.setVibrate(longArrayOf(0, 1000))
@@ -197,6 +343,13 @@ object SendMsgHelper {
         HEIGHT,
         DEFAULT,
         NO_CANCEL
+    }
+
+    private class CircleTask(
+        @Volatile var current: Int,
+        val total: Int,
+    ) {
+        lateinit var job: Job
     }
 
     class FcmToken {
@@ -330,6 +483,22 @@ object SendMsgHelper {
 
     }
 
+}
+
+internal data class CircleNoticeConfig(
+    val circleCount: Int = 15,
+    val intervalMillis: Long = 4_000L,
+)
+
+internal fun resolveCircleNoticeConfig(config: Map<String, Long>?): CircleNoticeConfig {
+    val count = config?.get(FirebaseHelper.remoteConfig.CIRCLE_COUNT)
+        ?: CircleNoticeConfig().circleCount.toLong()
+    val intervalSeconds = config?.get(FirebaseHelper.remoteConfig.INTERVAL_TIME)
+        ?: CircleNoticeConfig().intervalMillis / 1_000L
+    return CircleNoticeConfig(
+        circleCount = count.coerceAtLeast(1L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+        intervalMillis = if (intervalSeconds < 1L) 4_000L else intervalSeconds * 1_000L,
+    )
 }
 
 fun RemoteViews.setOnClickPendingIntent(viewId: Int, intent: Intent): PendingIntent {

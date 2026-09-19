@@ -112,6 +112,7 @@ object FirebaseHelper {
                 put("ad_frequency_limit",
 //                    "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50IjoxMCwKImFkX21heF9jbGlja19jb3VudCI6NQp9")
                     "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50Ijo1MCwKImFkX21heF9jbGlja19jb3VudCI6MjAKfQ==")
+                put("circle_notice_config","ewoiY2lyY2xlX2NvdW50IjoxNSwKImludGVydmFsX3RpbWUiOjQKfQ==")
             }
         }
 
@@ -205,6 +206,32 @@ object FirebaseHelper {
          */
         fun getAdFrequencyLimit(): String {
             return Firebase.remoteConfig.getString("ad_frequency_limit")
+        }
+
+        /**
+         * 循环通知次数
+         */
+        val CIRCLE_COUNT = "circle_count"
+
+        /**
+         * 循环通知间隔时间
+         */
+        val INTERVAL_TIME = "interval_time"
+
+        fun getCircleNoticeConfig(): Map<String, Long>? {
+            try {
+                val config = Firebase.remoteConfig.getString("circle_notice_config")
+                val json = JSONObject(String(Base64.decode(config, Base64.NO_WRAP)))
+                val circleCount = json.getLong(CIRCLE_COUNT)
+                val intervalTime = json.getLong(INTERVAL_TIME)
+                return mapOf(
+                    CIRCLE_COUNT to circleCount,
+                    INTERVAL_TIME to intervalTime,
+                )
+            }catch (e: Exception){
+                e.printStackTrace()
+                return null
+            }
         }
 
 
