@@ -503,6 +503,8 @@ object AdHelper {
             } else {
                 ms.data.setAdValue("firebase", totalValue, adValue.currencyCode, true)
             }
+
+            uploadTaichiAdValue(value, adValue.currencyCode)
             val proAdValue =
                 MsAdValue(adValue.valueMicros, adValue.currencyCode, adId, adType, sourceName)
             if (!uploadAdValueToReyun(proAdValue)) {
@@ -513,6 +515,28 @@ object AdHelper {
             val precisionType = adValue.precisionType
             FirebaseHelper.logEvent("adval_preci_${precisionType}")
             FirebaseHelper.logEvent("adval_preci_${position}_${precisionType}")
+        }
+
+        private fun uploadTaichiAdValue(value: Double, currencyCode: String) {
+            FirebaseHelper.remoteConfig.getTaichiAdValueConfig()?.forEach { (eventName, threshold) ->
+                val result = accumulateTaichiAdValue(
+                    currentValue = ms.data.getAdValue(eventName).first,
+                    addedValue = value,
+                    threshold = threshold,
+                )
+                ms.data.setAdValue(
+                    eventName,
+                    result.storedValue,
+                    if (result.reportValue == null) currencyCode else null,
+                    true,
+                )
+                result.reportValue?.let { reportValue ->
+                    FirebaseHelper.logEvent(eventName, Bundle().apply {
+                        putString(FirebaseAnalytics.Param.CURRENCY, currencyCode)
+                        putDouble(FirebaseAnalytics.Param.VALUE, reportValue)
+                    })
+                }
+            }
         }
 
         fun uploadAdValueToReyun(value: MsAdValue): Boolean {
@@ -541,6 +565,24 @@ object AdHelper {
                 e.printStackTrace()
             }
             return false
+        }
+    }
+
+    internal data class TaichiAdValueResult(
+        val storedValue: Double,
+        val reportValue: Double?,
+    )
+
+    internal fun accumulateTaichiAdValue(
+        currentValue: Double,
+        addedValue: Double,
+        threshold: Double,
+    ): TaichiAdValueResult {
+        val totalValue = currentValue + addedValue
+        return if (totalValue >= threshold) {
+            TaichiAdValueResult(storedValue = 0.0, reportValue = totalValue)
+        } else {
+            TaichiAdValueResult(storedValue = totalValue, reportValue = null)
         }
     }
 

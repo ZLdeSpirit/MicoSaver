@@ -112,6 +112,10 @@ object FirebaseHelper {
 
                 // 是否优先展示广告价值较高的广告
                 put("ms_ad_value_pre", true)
+                put(
+                    "taichi_ad_value_config",
+                    "eyJ0YWljaGlfMDAzIjowLjAzLCJ0YWljaGlfMDA1IjowLjA1LCJ0YWljaGlfMDA4IjowLjA4fQ==",
+                )
 
                 put("ad_frequency_limit",
 //                    "ewoiYWRfc2hvd19jbGlja19pbnRlcnZhbCI6MTQ0MCwKImFkX21heF9zaG93X2NvdW50IjoxMCwKImFkX21heF9jbGlja19jb3VudCI6NQp9")
@@ -197,6 +201,19 @@ object FirebaseHelper {
             get() {
                 return Firebase.remoteConfig.getBoolean("ms_ad_value_pre")
             }
+
+        fun getTaichiAdValueConfig(): Map<String, Double>? {
+            return try {
+                val config = Firebase.remoteConfig.getString("taichi_ad_value_config")
+                val json = JSONObject(String(Base64.decode(config, Base64.NO_WRAP)))
+                buildMap {
+                    json.keys().forEach { key -> put(key, json.getDouble(key)) }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
 
         val googleFlavorConfig: String
             get() {
