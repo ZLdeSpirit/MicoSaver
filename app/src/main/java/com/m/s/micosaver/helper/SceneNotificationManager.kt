@@ -4,30 +4,19 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.createBitmap
-import com.bumptech.glide.Glide
-import com.m.s.micosaver.R
 import com.m.s.micosaver.ad.AdFrequencyLimiter
 import com.m.s.micosaver.channel.AppChannelHelper
-import com.m.s.micosaver.db.info.RecommendBean
 import com.m.s.micosaver.ex.scope
-import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.ms
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object SceneNotificationManager {
     const val TAG = "SceneNotification"
@@ -160,30 +149,13 @@ object SceneNotificationManager {
             Log.i(TAG, "scene=${scene.logName} sent=false reason=$blockedReason")
             return
         }
-        RecommendManager.getPurchaseUserFunList { list ->
-            val recommend = list.randomOrNull()
-            if (recommend == null) {
-                Log.i(TAG, "scene=${scene.logName} sent=false reason=no_recommendation")
-                return@getPurchaseUserFunList
-            }
-            scope.launch {
-                val image = createCoverBitmap(recommend.cover)
-                withContext(Dispatchers.Main) {
-                    val currentBlockedReason = blockedReason(scene)
-                    if (currentBlockedReason != null) {
-                        Log.i(TAG, "scene=${scene.logName} sent=false reason=$currentBlockedReason")
-                        return@withContext
-                    }
-                    val sent = sendRecommendation(recommend, image)
-                    Log.i(TAG, "scene=${scene.logName} sent=$sent")
-                    if (sent) {
-                        NotificationIntervalLimiter.recordSent(scene.logName)
-                        FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
-                            putString("type", scene.logName)
-                        })
-                    }
-                }
-            }
+        scope.launch {
+            val sent = RecommendationNotificationSender.send(
+                logType = scene.logName,
+                intervalScene = scene.logName,
+                finalCheck = { blockedReason(scene) == null },
+            )
+            Log.i(TAG, "scene=${scene.logName} sent=$sent")
         }
     }
 
@@ -202,45 +174,6 @@ object SceneNotificationManager {
         }
     }
 
-    private fun sendRecommendation(recommend: RecommendBean, image: Bitmap?): Boolean {
-        val msgId = SendMsgHelper.getMsgId()
-        val intent = SendMsgHelper.createMsgIntent(msgId).apply {
-            putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.PARSE.type)
-            putExtra(ParamsHelper.KEY_PARSE_URL, recommend.url)
-        }
-        val title = recommend.desc.ifBlank {
-            recommend.authorName.ifBlank { ms.getString(R.string.ms_app_name) }
-        }
-        return SendMsgHelper.sendRecommendMsg(
-            msgId,
-            image,
-            title,
-            ms.getString(R.string.ms_view),
-            intent,
-        )
-    }
-
-    private fun createCoverBitmap(coverUrl: String): Bitmap? {
-        if (coverUrl.isBlank()) return null
-        return try {
-            val drawable = Glide.with(ms).asDrawable().load(coverUrl).submit().get() ?: return null
-            if (drawable is BitmapDrawable) {
-                drawable.bitmap
-            } else {
-                createBitmap(
-                    drawable.intrinsicWidth.coerceAtLeast(1),
-                    drawable.intrinsicHeight.coerceAtLeast(1),
-                ).also { bitmap ->
-                    val canvas = Canvas(bitmap)
-                    drawable.setBounds(0, 0, canvas.width, canvas.height)
-                    drawable.draw(canvas)
-                }
-            }
-        } catch (e: Exception) {
-            Log.i(TAG, "load recommendation cover failed", e)
-            null
-        }
-    }
 }
 
 internal class BackgroundSceneClassifier(private val windowMillis: Long) {

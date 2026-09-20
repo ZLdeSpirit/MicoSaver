@@ -129,6 +129,10 @@
             android:name=".broadcast.NotificationDismissReceiver"
             android:exported="false" />
 
+        <receiver
+            android:name=".broadcast.ConditionalPollingAlarmReceiver"
+            android:exported="false" />
+
     </application>
 
 </manifest>

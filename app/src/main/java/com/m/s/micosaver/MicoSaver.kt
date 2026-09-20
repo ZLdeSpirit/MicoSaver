@@ -21,6 +21,7 @@ import com.m.s.micosaver.broadcast.BroadcastHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.firebase.FirebaseHelper
 import com.m.s.micosaver.helper.ApiRequestHelper
+import com.m.s.micosaver.helper.ConditionalPollingManager
 import com.m.s.micosaver.helper.FcmTopicsManager
 import com.m.s.micosaver.helper.LifecycleHelper
 import com.m.s.micosaver.helper.RecommendManager
@@ -77,6 +78,7 @@ class MicoSaver : Application(){
         super.onCreate()
         ms = this
         AppInitHelper().init()
+        ConditionalPollingManager.start("application_on_create")
         FirebaseHelper.logEvent("ms_app_open")
     }
 
@@ -494,6 +496,12 @@ class MicoSaver : Application(){
         fun setNoticeLastSentTime(scene: String, time: Long) {
             data.edit(commit = true) { putLong("notice_last_sent_$scene", time) }
         }
+
+        var lastFcmMessage: String?
+            get() = data.getString("last_fcm_message", null)
+            set(value) {
+                data.edit(commit = true) { putString("last_fcm_message", value) }
+            }
 
         internal fun getAdFrequencyState(): AdFrequencyState {
             return AdFrequencyState(
