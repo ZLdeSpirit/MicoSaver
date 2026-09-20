@@ -1,12 +1,9 @@
 package com.m.s.micosaver.services
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.util.Base64
@@ -15,25 +12,24 @@ import androidx.core.graphics.createBitmap
 import com.bumptech.glide.Glide
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.m.s.micosaver.R
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.ex.scope
+import com.m.s.micosaver.firebase.FirebaseHelper
+import com.m.s.micosaver.helper.ConditionalPollingManager
+import com.m.s.micosaver.helper.FcmNotificationConditions
 import com.m.s.micosaver.helper.LifecycleHelper
-import com.m.s.micosaver.helper.ParamsHelper
 import com.m.s.micosaver.helper.NotificationIntervalLimiter
+import com.m.s.micosaver.helper.ParamsHelper
+import com.m.s.micosaver.helper.RecommendationNotificationSender
 import com.m.s.micosaver.helper.SendMsgHelper
+import com.m.s.micosaver.helper.shouldSendPermanentRecommendation
 import com.m.s.micosaver.ms
+import com.m.s.micosaver.utils.Tools
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
-import java.util.Calendar
-import kotlin.ranges.contains
-import com.m.s.micosaver.R
-import com.m.s.micosaver.ad.AdFrequencyLimiter
-import com.m.s.micosaver.firebase.FirebaseHelper
-import com.m.s.micosaver.utils.Tools
-import java.util.Locale
-import kotlin.text.toInt
 
 class FcmService : FirebaseMessagingService() {
     private val TAG = "FcmService"
@@ -43,22 +39,61 @@ class FcmService : FirebaseMessagingService() {
         val data = message.data
         Log.d(TAG, "onMessageReceived: ${data}")
         FirebaseHelper.logEvent("ms_receive_msg")
+        ConditionalPollingManager.beginDirectFcmHandling()
+        ConditionalPollingManager.saveFcmMessage(data)
+        ConditionalPollingManager.start("fcm_message", enqueueImmediate = false)
 
-        val fcmType = (data["msg_type"] ?: "0").toInt()
+        val fcmType = data["msg_type"]?.toIntOrNull() ?: 0
         when(fcmType){
             0 ->{//视频
                 Log.i(TAG, "receive video message")
-                FcmMsgHelper.sendMsg(data)
+                FcmMsgHelper.sendMsg(data) {
+                    ConditionalPollingManager.finishDirectFcmHandling("fcm_video_complete")
+                }
             }
             1 ->{
                 Log.i(TAG, "receive permanent message")
-                if (AppChannelHelper.isPro) {
-                    FirebaseHelper.logEvent("fcm_message_send_permanent_notice")
-                    Tools.startForegroundService()
-                }
+                FirebaseHelper.logEvent("fcm_message_send_permanent_notice")
+                Tools.startForegroundService()
+                sendPermanentRecommendation()
             }
+            else -> ConditionalPollingManager.finishDirectFcmHandling("fcm_unknown_type")
         }
 
+    }
+
+    private fun sendPermanentRecommendation() {
+        val canSend = shouldSendPermanentRecommendation(
+            isPurchaseUser = AppChannelHelper.isPro,
+            isForeground = LifecycleHelper.isForeground,
+            intervalAllowed = NotificationIntervalLimiter.canSend(
+                NotificationIntervalLimiter.FCM_PUSH,
+            ),
+        )
+        if (!canSend) {
+            Log.i(TAG, "permanent recommendation sent=false reason=condition")
+            ConditionalPollingManager.finishDirectFcmHandling("fcm_permanent_complete")
+            return
+        }
+        scope.launch {
+            try {
+                RecommendationNotificationSender.send(
+                    logType = NotificationIntervalLimiter.FCM_PUSH,
+                    intervalScene = NotificationIntervalLimiter.FCM_PUSH,
+                    finalCheck = {
+                        shouldSendPermanentRecommendation(
+                            isPurchaseUser = AppChannelHelper.isPro,
+                            isForeground = LifecycleHelper.isForeground,
+                            intervalAllowed = NotificationIntervalLimiter.canSend(
+                                NotificationIntervalLimiter.FCM_PUSH,
+                            ),
+                        )
+                    },
+                )
+            } finally {
+                ConditionalPollingManager.finishDirectFcmHandling("fcm_permanent_complete")
+            }
+        }
     }
 
     override fun onNewToken(token: String) {
@@ -83,96 +118,27 @@ class FcmService : FirebaseMessagingService() {
         }
         private var idIndex = 0
 
-        fun sendMsg(msg: Map<String, String>) {
+        fun sendMsg(msg: Map<String, String>, onComplete: () -> Unit = {}) {
             setAppChannel(msg)
-            if (!canSendVideoNotification()) return
-            if (ms.isOpenMsg) FirebaseHelper.logEvent("ms_receive_open")
-            if (!AppChannelHelper.isPro) return
-            FirebaseHelper.logEvent("ms_receive_pro")
-            if (LifecycleHelper.isForeground) return
-            FirebaseHelper.logEvent("ms_receive_background")
-            if (!checkSendTime(msg)) return
-            if (!checkInstallLimit(msg["install_limit"])) return
-            if (!checkCountry(msg["ctr"], msg["ex_ctr"])) return
-            if (!checkVersion(msg["ver"])) return
-            if (!NotificationIntervalLimiter.canSend(NotificationIntervalLimiter.FCM_PUSH)) {
-                Log.i(TAG, "drop video notification: notice interval")
+            val blockedReason = FcmNotificationConditions.blockedReason(
+                msg,
+                trackFcmAnalytics = true,
+            )
+            if (blockedReason != null) {
+                Log.i(TAG, "drop video notification: $blockedReason")
+                onComplete()
                 return
             }
 
             FirebaseHelper.logEvent("ms_receive_send")
-            startSend(msg)
+            startSend(msg, onComplete)
         }
 
-        private fun checkInstallLimit(limit: String?): Boolean {
-            return try {
-                if (limit.isNullOrEmpty()) return true
-                val array = JSONArray(limit)
-                if (array.length() < 2) return true
-                val minInstallMinutes = if (array.isNull(0)) null else array.getLong(0)
-                val maxInstallMinutes = if (array.isNull(1)) null else array.getLong(1)
-                val installMinutes = (System.currentTimeMillis() - ms.appInstallTime) / 60_000
-                (minInstallMinutes == null || installMinutes >= minInstallMinutes)
-                        && (maxInstallMinutes == null || installMinutes < maxInstallMinutes)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                true
-            }
-        }
-
-        private fun checkCountry(ctr: String?, exCtr: String?): Boolean {
-            val country = Locale.getDefault().country.lowercase(Locale.US)
-            val excludeCountries = parseLowercaseArray(exCtr)
-            if (!excludeCountries.isNullOrEmpty()) {
-                if (excludeCountries.contains("all")) return false
-                return !excludeCountries.contains(country)
-            }
-
-            val countries = parseLowercaseArray(ctr)
-            if (countries.isNullOrEmpty()) return true
-            return countries.contains("all") || countries.contains(country)
-        }
-
-        private fun checkVersion(ver: String?): Boolean {
-            val versions = parseLowercaseArray(ver)
-            if (versions.isNullOrEmpty()) return true
-            if (versions.contains("all")) return true
-            val versionName = getAppVersionName(ms).lowercase(Locale.US)
-            return versions.contains(versionName)
-        }
-
-        fun getAppVersionName(context: Context): String {
-            return try {
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
-            } catch (e: Exception) {
-                ""
-            }
-        }
-
-        private fun parseLowercaseArray(value: String?): List<String>? {
-            return try {
-                if (value.isNullOrEmpty()) return null
-                val array = JSONArray(value)
-                val list = mutableListOf<String>()
-                for (index in 0 until array.length()) {
-                    if (!array.isNull(index)) {
-                        val item = array.getString(index).lowercase(Locale.US)
-                        if (item.isNotEmpty()) {
-                            list.add(item)
-                        }
-                    }
-                }
-                list
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-
-        private fun startSend(msg: Map<String, String>) {
+        private fun startSend(msg: Map<String, String>, onComplete: () -> Unit) {
             val videoInfo = msg["video_info"]
             if (videoInfo.isNullOrEmpty()) {
                 logEventFail("video_empty")
+                onComplete()
                 return
             }
             scope.launch {
@@ -180,59 +146,61 @@ class FcmService : FirebaseMessagingService() {
                     val array = JSONArray(String(Base64.decode(videoInfo, Base64.NO_WRAP)))
                     if (array.length() <= 0) {
                         logEventFail("video_empty")
-                        return@launch
+                    } else {
+                        startSend(msg, array)
                     }
-                    startSend(array)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.i(TAG, "parse video message failed", e)
                     logEventFail(e.message)
+                } finally {
+                    onComplete()
                 }
             }
         }
 
-        private fun startSend(array: JSONArray) {
+        private suspend fun startSend(msg: Map<String, String>, array: JSONArray) {
             val contentList = getMsgContent()
             for (index in 0 until array.length()) {
                 val json = array.getJSONObject(index)
                 val parseUrl = json.getString("or_url")
                 val coverUrl = json.getString("cover")
                 val content = getMsgContent(contentList)
-                sendMsg(parseUrl, coverUrl, content)
+                sendMsg(msg, parseUrl, coverUrl, content)
             }
         }
 
-        private fun sendMsg(parseUrl: String, coverUrl: String, content: Pair<Int, Int>) {
+        private suspend fun sendMsg(
+            msg: Map<String, String>,
+            parseUrl: String,
+            coverUrl: String,
+            content: Pair<Int, Int>,
+        ) {
             val msgId = getMsgId()
-            scope.launch {
-                val coverBitmap = createCoverBitmap(coverUrl)
-                withContext(Dispatchers.Main) {
-                    val intent = SendMsgHelper.createMsgIntent(msgId).apply {
-                        putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.PARSE.type)
-                        putExtra(ParamsHelper.KEY_PARSE_URL, parseUrl)
-                    }
-                    val desc = ms.getString(content.first)
-                    val button = ms.getString(content.second)
-
-                    if (!canSendVideoNotification()) return@withContext
-                    if (!NotificationIntervalLimiter.canSend(NotificationIntervalLimiter.FCM_PUSH)) {
-                        Log.i(TAG, "drop video notification: notice interval")
-                        return@withContext
-                    }
-                    val isSent = SendMsgHelper.sendRecommendMsg(
-                        msgId,
-                        coverBitmap,
-                        desc,
-                        button,
-                        intent,
-                    )
-                    if (isSent) {
-                        NotificationIntervalLimiter.recordSent(NotificationIntervalLimiter.FCM_PUSH)
-                        FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
-                            putString("type", ParamsHelper.EnterType.PARSE.type)
-                        })
-                    } else {
-                        logEventFail("notify_failed")
-                    }
+            val coverBitmap = createCoverBitmap(coverUrl)
+            withContext(Dispatchers.Main) {
+                val blockedReason = FcmNotificationConditions.blockedReason(msg)
+                if (blockedReason != null) {
+                    Log.i(TAG, "drop video notification before send: $blockedReason")
+                    return@withContext
+                }
+                val intent = SendMsgHelper.createMsgIntent(msgId).apply {
+                    putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.PARSE.type)
+                    putExtra(ParamsHelper.KEY_PARSE_URL, parseUrl)
+                }
+                val isSent = SendMsgHelper.sendRecommendMsg(
+                    msgId,
+                    coverBitmap,
+                    ms.getString(content.first),
+                    ms.getString(content.second),
+                    intent,
+                )
+                if (isSent) {
+                    NotificationIntervalLimiter.recordSent(NotificationIntervalLimiter.FCM_PUSH)
+                    FirebaseHelper.logEvent("ms_send_msg_suc", Bundle().apply {
+                        putString("type", ParamsHelper.EnterType.PARSE.type)
+                    })
+                } else {
+                    logEventFail("notify_failed")
                 }
             }
         }
@@ -266,37 +234,6 @@ class FcmService : FirebaseMessagingService() {
             FirebaseHelper.logEvent("ms_send_fail", Bundle().apply {
                 putString("msg", msg)
             })
-        }
-
-        private fun canSendVideoNotification(): Boolean {
-            if (AdFrequencyLimiter.isLimited()) {
-                Log.i(TAG, "drop video notification: ad frequency limited")
-                return false
-            }
-            val connectivityManager =
-                ms.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val network = connectivityManager.activeNetwork
-            val capabilities = network?.let(connectivityManager::getNetworkCapabilities)
-            val isAvailable = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true &&
-                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-            if (!isAvailable) Log.i(TAG, "drop video notification: network unavailable")
-            return isAvailable
-        }
-
-        private fun checkSendTime(msg: Map<String, String>): Boolean {
-            val date = msg["date_range"]
-            if (date.isNullOrEmpty()) return true
-            try {
-                val array = JSONArray(date)
-                if (array.length() < 2) return true
-                val start = array.getLong(0)
-                val end = array.getLong(1)
-                val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                return hour in start..end
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return true
         }
 
         private fun setAppChannel(msg: Map<String, String>) {
