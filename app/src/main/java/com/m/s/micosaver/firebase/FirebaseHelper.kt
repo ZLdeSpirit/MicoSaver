@@ -17,7 +17,11 @@ import com.m.s.micosaver.Constant
 import com.m.s.micosaver.ad.AdHelper
 import com.m.s.micosaver.channel.AppChannelHelper
 import com.m.s.micosaver.helper.ApiRequestHelper
+import com.m.s.micosaver.helper.DEFAULT_NOTICE_INTERVAL_SECONDS
 import com.m.s.micosaver.helper.FcmTopicsManager
+import com.m.s.micosaver.helper.NoticeInstallOther
+import com.m.s.micosaver.helper.NoticeInstallRange
+import com.m.s.micosaver.helper.NoticeIntervalConfig
 import com.m.s.micosaver.ms
 import org.json.JSONObject
 
@@ -116,7 +120,7 @@ object FirebaseHelper {
                 put("media_notice_switch", true)
                 put(
                     "notice_interval_config",
-                    "eyJmY21fcHVzaCI6MzAwLCJ1bmxvY2siOjMwMCwiaG9tZSI6MzAwLCJiYWNrZ3JvdW5kIjozMDAsImFkX2NsaWNrIjozMDAsInJlY2VudF9hcHBzIjozMDAsIndpZmlfY2hhbmdlZCI6MzAwLCJ1c2JfY29ubmVjdGVkIjozMDAsInBvd2VyX2Nvbm5lY3RlZCI6MzAwLCJhcHBfaW5zdGFsbGVkIjozMDAsImJvb3QiOjMwMCwiZmlsZV9jaGFuZ2VkIjozMDAsInNjcmVlbnNob3QiOjMwMH0=",
+                    "eyJmY21fcHVzaCI6eyJpbnN0YWxsX3RpbWUiOjAsImRlZmF1bHRfaW50ZXJ2YWwiOjMwMCwiaW5zdGFsbF9yYW5nZSI6bnVsbCwiaW5zdGFsbF9vdGhlciI6bnVsbH0sImhvbWUiOnsiaW5zdGFsbF90aW1lIjowLCJkZWZhdWx0X2ludGVydmFsIjozMDAsImluc3RhbGxfcmFuZ2UiOm51bGwsImluc3RhbGxfb3RoZXIiOm51bGx9LCJiYWNrZ3JvdW5kIjp7Imluc3RhbGxfdGltZSI6MCwiZGVmYXVsdF9pbnRlcnZhbCI6MzAwLCJpbnN0YWxsX3JhbmdlIjpudWxsLCJpbnN0YWxsX290aGVyIjpudWxsfSwidW5sb2NrIjp7Imluc3RhbGxfdGltZSI6MCwiZGVmYXVsdF9pbnRlcnZhbCI6MzAwLCJpbnN0YWxsX3JhbmdlIjpudWxsLCJpbnN0YWxsX290aGVyIjpudWxsfSwidXNiX2Nvbm5lY3RlZCI6eyJpbnN0YWxsX3RpbWUiOjAsImRlZmF1bHRfaW50ZXJ2YWwiOjMwMCwiaW5zdGFsbF9yYW5nZSI6bnVsbCwiaW5zdGFsbF9vdGhlciI6bnVsbH0sImFkX2NsaWNrIjp7Imluc3RhbGxfdGltZSI6MCwiZGVmYXVsdF9pbnRlcnZhbCI6MzAwLCJpbnN0YWxsX3JhbmdlIjpudWxsLCJpbnN0YWxsX290aGVyIjpudWxsfSwicmVjZW50X2FwcHMiOnsiaW5zdGFsbF90aW1lIjowLCJkZWZhdWx0X2ludGVydmFsIjozMDAsImluc3RhbGxfcmFuZ2UiOm51bGwsImluc3RhbGxfb3RoZXIiOm51bGx9LCJ3aWZpX2NoYW5nZWQiOnsiaW5zdGFsbF90aW1lIjowLCJkZWZhdWx0X2ludGVydmFsIjozMDAsImluc3RhbGxfcmFuZ2UiOm51bGwsImluc3RhbGxfb3RoZXIiOm51bGx9LCJhcHBfaW5zdGFsbGVkIjp7Imluc3RhbGxfdGltZSI6MCwiZGVmYXVsdF9pbnRlcnZhbCI6MzAwLCJpbnN0YWxsX3JhbmdlIjpudWxsLCJpbnN0YWxsX290aGVyIjpudWxsfSwiYm9vdCI6eyJpbnN0YWxsX3RpbWUiOjAsImRlZmF1bHRfaW50ZXJ2YWwiOjMwMCwiaW5zdGFsbF9yYW5nZSI6bnVsbCwiaW5zdGFsbF9vdGhlciI6bnVsbH0sImZpbGVfY2hhbmdlZCI6eyJpbnN0YWxsX3RpbWUiOjAsImRlZmF1bHRfaW50ZXJ2YWwiOjMwMCwiaW5zdGFsbF9yYW5nZSI6bnVsbCwiaW5zdGFsbF9vdGhlciI6bnVsbH0sInNjcmVlbnNob3QiOnsiaW5zdGFsbF90aW1lIjowLCJkZWZhdWx0X2ludGVydmFsIjozMDAsImluc3RhbGxfcmFuZ2UiOm51bGwsImluc3RhbGxfb3RoZXIiOm51bGx9LCJwb3dlcl9jb25uZWN0ZWQiOnsiaW5zdGFsbF90aW1lIjowLCJkZWZhdWx0X2ludGVydmFsIjozMDAsImluc3RhbGxfcmFuZ2UiOm51bGwsImluc3RhbGxfb3RoZXIiOm51bGx9fQ==",
                 )
             }
         }
@@ -244,12 +248,45 @@ object FirebaseHelper {
          */
         fun getMediaNoticeSwitch(): Boolean = Firebase.remoteConfig.getBoolean("media_notice_switch")
 
-        fun getNoticeIntervalConfig(): Map<String, Long>? {
+        internal fun getNoticeIntervalConfig(): Map<String, NoticeIntervalConfig>? {
             return try {
                 val config = Firebase.remoteConfig.getString("notice_interval_config")
                 val json = JSONObject(String(Base64.decode(config, Base64.NO_WRAP)))
                 buildMap {
-                    json.keys().forEach { key -> put(key, json.getLong(key)) }
+                    json.keys().forEach { key ->
+                        val scene = json.optJSONObject(key) ?: return@forEach
+                        val range = scene.optJSONObject("install_range")?.let {
+                            NoticeInstallRange(
+                                startTimeSeconds = it.optLong("start_time", 0L),
+                                endTimeSeconds = it.optLong("end_time", 0L),
+                                intervalSeconds = it.optLong(
+                                    "interval",
+                                    DEFAULT_NOTICE_INTERVAL_SECONDS,
+                                ),
+                            )
+                        }
+                        val other = scene.optJSONObject("install_other")?.let {
+                            NoticeInstallOther(
+                                timeSeconds = it.optLong("time", 0L),
+                                intervalSeconds = it.optLong(
+                                    "interval",
+                                    DEFAULT_NOTICE_INTERVAL_SECONDS,
+                                ),
+                            )
+                        }
+                        put(
+                            key,
+                            NoticeIntervalConfig(
+                                installTimeSeconds = scene.optLong("install_time", 0L),
+                                defaultIntervalSeconds = scene.optLong(
+                                    "default_interval",
+                                    DEFAULT_NOTICE_INTERVAL_SECONDS,
+                                ),
+                                installRange = range,
+                                installOther = other,
+                            ),
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
