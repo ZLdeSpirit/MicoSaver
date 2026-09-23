@@ -193,6 +193,7 @@ class FcmService : FirebaseMessagingService() {
                     ms.getString(content.first),
                     ms.getString(content.second),
                     intent,
+                    NotificationIntervalLimiter.FCM_PUSH,
                 )
                 if (isSent) {
                     NotificationIntervalLimiter.recordSent(NotificationIntervalLimiter.FCM_PUSH)

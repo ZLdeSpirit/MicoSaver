@@ -12,13 +12,14 @@ import com.m.s.micosaver.ms
 import java.io.File
 
 object FileChangeMonitor {
+    const val TAG = "FileChangeMonitor"
     private const val CHANGE_DELAY = 10_000L
     private val observers = mutableMapOf<String, FileObserver>()
 
     fun start() {
         observeMediaStore()
         buildList {
-            add(ms.filesDir)
+            add(File(ms.filesDir, "video").apply { mkdirs() })
             ms.getExternalFilesDirs(null).filterNotNullTo(this)
         }.forEach(::observeDirectoryTree)
     }
@@ -46,12 +47,17 @@ object FileChangeMonitor {
     }
 
     private fun handleMediaChange(uri: Uri?) {
+        if (uri == null) {
+            Log.i(TAG, "source=media_store ignored=true reason=missing_uri")
+            return
+        }
         val path = queryPath(uri)
         val scene = if (isScreenshotPath(path)) {
             SceneNotificationManager.Scene.SCREENSHOT
         } else {
             SceneNotificationManager.Scene.FILE_CHANGED
         }
+        Log.i(TAG, "source=media_store uri=$uri path=$path scene=${scene.logName}")
         SceneNotificationManager.schedule(scene, CHANGE_DELAY)
     }
 
@@ -95,14 +101,26 @@ object FileChangeMonitor {
             override fun onEvent(event: Int, childPath: String?) {
                 if (childPath == null) return
                 val changedFile = File(directory, childPath)
-                if (event and (CREATE or MOVED_TO) != 0 && changedFile.isDirectory) {
-                    observeDirectoryTree(changedFile)
+                val isDirectory = changedFile.isDirectory ||
+                    observers.containsKey(changedFile.absolutePath)
+                if (isDirectory) {
+                    if (event and (CREATE or MOVED_TO) != 0) observeDirectoryTree(changedFile)
+                    if (event and (DELETE or MOVED_FROM) != 0) {
+                        observers.remove(changedFile.absolutePath)?.stopWatching()
+                    }
+                    Log.i(TAG, "source=file_observer path=${changedFile.absolutePath} ignored=true reason=directory")
+                    return
                 }
                 val scene = if (isScreenshotPath(changedFile.absolutePath)) {
                     SceneNotificationManager.Scene.SCREENSHOT
                 } else {
                     SceneNotificationManager.Scene.FILE_CHANGED
                 }
+                Log.i(
+                    TAG,
+                    "source=file_observer path=${changedFile.absolutePath} event=$event " +
+                        "scene=${scene.logName}",
+                )
                 SceneNotificationManager.schedule(scene, CHANGE_DELAY)
             }
         }

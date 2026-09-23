@@ -38,6 +38,7 @@ internal object MediaNoticeManager {
     const val NOTIFICATION_ID = 89492
 
     private const val CHANNEL_ID = "ms_media_heads_up_v1"
+    private const val SILENT_CHANNEL_ID = "ms_media_heads_up_silent_v1"
     private const val SESSION_ID = "ms_media_notice"
     private const val MEDIA_INTERVAL_MILLIS = 2_000L
     private const val MIN_RESET_MINUTES = 20
@@ -59,6 +60,7 @@ internal object MediaNoticeManager {
         action: String,
         contentIntent: Intent,
         ordinaryConfig: CircleNoticeConfig,
+        source: String,
     ): Boolean {
         ensureChannel()
         val now = SystemClock.elapsedRealtime()
@@ -75,14 +77,18 @@ internal object MediaNoticeManager {
         val previousTask = circleTask
         val newTotalCircle = resolveMediaCircleCount(ordinaryConfig)
         val sent = notify(title, action, contentIntent, silent = false)
-        Log.i(TAG, "id=$NOTIFICATION_ID current=1 total=$newTotalCircle silent=false sent=$sent")
+        Log.i(
+            TAG,
+            "source=$source id=$NOTIFICATION_ID current=1 total=$newTotalCircle " +
+                "silent=false sent=$sent",
+        )
         if (!sent) return false
         previousTask?.job?.cancel()
         totalCircle = newTotalCircle
         currentCircle = 1
         circleTask = null
         if (newTotalCircle > 1) {
-            val task = MediaCircleTask(current = 1, total = newTotalCircle)
+            val task = MediaCircleTask(source = source, current = 1, total = newTotalCircle)
             task.job = scope.launch(start = CoroutineStart.LAZY) {
                 try {
                     for (current in 2..task.total) {
@@ -98,7 +104,7 @@ internal object MediaNoticeManager {
                         }
                         Log.i(
                             TAG,
-                            "id=$NOTIFICATION_ID current=$current total=${task.total} " +
+                            "source=$source id=$NOTIFICATION_ID current=$current total=${task.total} " +
                                 "silent=true sent=$updateSent",
                         )
                         if (!updateSent) break
@@ -110,6 +116,11 @@ internal object MediaNoticeManager {
                 }
             }
             circleTask = task
+            Log.i(
+                TAG,
+                "source=$source id=$NOTIFICATION_ID loop=started total=$newTotalCircle " +
+                    "intervalMs=$MEDIA_INTERVAL_MILLIS",
+            )
             task.job.start()
         }
         return true
@@ -143,7 +154,11 @@ internal object MediaNoticeManager {
                 contentIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
-            val builder = NotificationCompat.Builder(ms, CHANNEL_ID)
+            val manager = NotificationManagerCompat.from(ms)
+            val builder = NotificationCompat.Builder(
+                ms,
+                if (silent) SILENT_CHANNEL_ID else CHANNEL_ID,
+            )
                 .setSmallIcon(R.mipmap.ms_ic_launcher)
                 .setContentTitle(title)
                 .setContentText(action)
@@ -153,17 +168,15 @@ internal object MediaNoticeManager {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setOnlyAlertOnce(true)
                 .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
             if (silent) {
-                builder.setSilent(true)
                 builder.setSound(null)
                 builder.setVibrate(null)
             } else {
                 builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 builder.setVibrate(longArrayOf(0, 1000))
             }
-            NotificationManagerCompat.from(ms).notify(NOTIFICATION_ID, builder.build())
+            manager.notify(NOTIFICATION_ID, builder.build())
             isNoticeShown = true
             true
         } catch (e: Exception) {
@@ -207,15 +220,26 @@ internal object MediaNoticeManager {
 
     private fun ensureChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        NotificationManagerCompat.from(ms).createNotificationChannel(
-            NotificationChannel(
-                CHANNEL_ID,
-                ms.getString(R.string.ms_app_name),
-                NotificationManager.IMPORTANCE_HIGH,
-            ).apply {
-                enableVibration(true)
-                vibrationPattern = longArrayOf(0, 1000)
-            },
+        NotificationManagerCompat.from(ms).createNotificationChannels(
+            listOf(
+                NotificationChannel(
+                    CHANNEL_ID,
+                    ms.getString(R.string.ms_app_name),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    enableVibration(true)
+                    vibrationPattern = longArrayOf(0, 1000)
+                },
+                NotificationChannel(
+                    SILENT_CHANNEL_ID,
+                    ms.getString(R.string.ms_app_name),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    setSound(null, null)
+                    enableVibration(false)
+                    vibrationPattern = null
+                },
+            ),
         )
     }
 
@@ -225,6 +249,7 @@ internal object MediaNoticeManager {
     }
 
     private fun cancelActive(reason: String) {
+        val source = circleTask?.source ?: "unknown"
         circleTask?.job?.cancel()
         circleTask = null
         NotificationManagerCompat.from(ms).cancel(NOTIFICATION_ID)
@@ -236,11 +261,13 @@ internal object MediaNoticeManager {
         player = null
         Log.i(
             TAG,
-            "id=$NOTIFICATION_ID stopped reason=$reason current=$currentCircle total=$totalCircle",
+            "source=$source id=$NOTIFICATION_ID stopped reason=$reason " +
+                "current=$currentCircle total=$totalCircle",
         )
     }
 
     private class MediaCircleTask(
+        val source: String,
         @Volatile var current: Int,
         val total: Int,
     ) {

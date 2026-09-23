@@ -35,7 +35,7 @@ object RecommendationNotificationSender {
                 Log.i(TAG, "type=$logType sent=false reason=final_condition")
                 return@withContext false
             }
-            val sent = sendRecommendation(recommend, image)
+            val sent = sendRecommendation(recommend, image, logType)
             Log.i(TAG, "type=$logType sent=$sent")
             if (sent) {
                 NotificationIntervalLimiter.recordSent(intervalScene)
@@ -54,7 +54,11 @@ object RecommendationNotificationSender {
             }
         }
 
-    private fun sendRecommendation(recommend: RecommendBean, image: Bitmap?): Boolean {
+    private fun sendRecommendation(
+        recommend: RecommendBean,
+        image: Bitmap?,
+        logType: String,
+    ): Boolean {
         val msgId = SendMsgHelper.getMsgId()
         val intent = SendMsgHelper.createMsgIntent(msgId).apply {
             putExtra(ParamsHelper.KEY_ENTER_TYPE, ParamsHelper.EnterType.PARSE.type)
@@ -69,6 +73,7 @@ object RecommendationNotificationSender {
             title,
             ms.getString(R.string.ms_view),
             intent,
+            logType,
         )
     }
 
