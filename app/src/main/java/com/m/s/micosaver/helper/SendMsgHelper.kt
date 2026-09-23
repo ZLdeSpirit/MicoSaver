@@ -48,6 +48,7 @@ import kotlin.math.abs
 object SendMsgHelper {
     const val CIRCLE_NOTICE_TAG = "CircleNotice"
     private const val FCM_CHANNEL_ID = "ms_fcm_heads_up_v2"
+    private const val FCM_SILENT_CHANNEL_ID = "ms_fcm_heads_up_silent_v1"
     private const val DOWNLOAD_CHANNEL_ID = "ms_download"
 
     private var msgId = 89493
@@ -124,6 +125,7 @@ object SendMsgHelper {
         title: String,
         action: String,
         intent: Intent,
+        source: String,
     ): Boolean {
         if (!ms.isOpenMsg) {
             if (!AppChannelHelper.isPro) {
@@ -144,6 +146,7 @@ object SendMsgHelper {
                     MediaNoticeManager.NOTIFICATION_ID,
                 ),
                 resolveCircleNoticeConfig(FirebaseHelper.remoteConfig.getCircleNoticeConfig()),
+                source,
             )
             if (sent) stopCircleNoticeLoops("replaced_by_media_notice")
             return sent
@@ -208,7 +211,8 @@ object SendMsgHelper {
         )
         Log.i(
             CIRCLE_NOTICE_TAG,
-            "id=$msgId current=1 total=${config.circleCount} silent=false sent=$firstSent",
+            "source=$source id=$msgId current=1 total=${config.circleCount} " +
+                "intervalMs=${config.intervalMillis} silent=false sent=$firstSent",
         )
         if (firstSent) {
             stopCircleNoticeLoops("replaced_by_new_notice")
@@ -222,6 +226,12 @@ object SendMsgHelper {
                 bigLayout,
                 title,
                 deleteIntent,
+                source,
+            )
+        } else if (firstSent) {
+            Log.i(
+                CIRCLE_NOTICE_TAG,
+                "source=$source id=$msgId loop=false reason=circle_count_one",
             )
         }
         return firstSent
@@ -233,7 +243,8 @@ object SendMsgHelper {
                 task.job.cancel()
                 Log.i(
                     CIRCLE_NOTICE_TAG,
-                    "id=$id stopped reason=$reason current=${task.current} total=${task.total}",
+                    "source=${task.source} id=$id stopped reason=$reason " +
+                        "current=${task.current} total=${task.total}",
                 )
             }
         }
@@ -247,7 +258,8 @@ object SendMsgHelper {
         NotificationManagerCompat.from(ms).cancel(msgId)
         Log.i(
             CIRCLE_NOTICE_TAG,
-            "id=$msgId stopped reason=$reason current=${task?.current ?: "finished"} " +
+            "source=${task?.source ?: "unknown"} id=$msgId stopped reason=$reason " +
+                "current=${task?.current ?: "finished"} " +
                 "total=${task?.total ?: "finished"}",
         )
     }
@@ -260,8 +272,9 @@ object SendMsgHelper {
         bigLayout: RemoteViews,
         title: String,
         deleteIntent: PendingIntent,
+        source: String,
     ) {
-        val task = CircleTask(current = 1, total = config.circleCount)
+        val task = CircleTask(source = source, current = 1, total = config.circleCount)
         task.job = scope.launch(start = CoroutineStart.LAZY) {
             try {
                 for (current in 2..config.circleCount) {
@@ -279,16 +292,27 @@ object SendMsgHelper {
                     )
                     Log.i(
                         CIRCLE_NOTICE_TAG,
-                        "id=$msgId current=$current total=${config.circleCount} " +
+                        "source=$source id=$msgId current=$current total=${config.circleCount} " +
                             "silent=true sent=$sent",
                     )
                     if (!sent) break
                 }
             } finally {
-                circleTasks.remove(msgId, task)
+                if (circleTasks.remove(msgId, task)) {
+                    Log.i(
+                        CIRCLE_NOTICE_TAG,
+                        "source=$source id=$msgId loop=finished " +
+                            "current=${task.current} total=${task.total}",
+                    )
+                }
             }
         }
         circleTasks.put(msgId, task)?.job?.cancel()
+        Log.i(
+            CIRCLE_NOTICE_TAG,
+            "source=$source id=$msgId loop=started total=${config.circleCount} " +
+                "intervalMs=${config.intervalMillis}",
+        )
         task.job.start()
     }
 
@@ -305,7 +329,7 @@ object SendMsgHelper {
         val display = big ?: small
         val headsUp = medium ?: small
 
-        val builder = NotificationCompat.Builder(ms, getChannelId(msgType))
+        val builder = NotificationCompat.Builder(ms, getChannelId(msgType, silent))
         builder.setSmallIcon(R.mipmap.ms_ic_launcher)
         builder.setContentTitle(ms.getString(R.string.ms_app_name))
         builder.setContentText(alertText)
@@ -322,7 +346,6 @@ object SendMsgHelper {
         builder.setCategory(NotificationCompat.CATEGORY_MESSAGE)
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         deleteIntent?.let {
-            builder.setOnlyAlertOnce(true)
             builder.setDeleteIntent(it)
         }
 
@@ -333,7 +356,6 @@ object SendMsgHelper {
         if (msgType != MsgType.HEIGHT || silent) {
             builder.setVibrate(null)
             builder.setSound(null)
-            if (silent) builder.setSilent(true)
         } else {
             builder.setStyle(NotificationCompat.BigPictureStyle())
             builder.setVibrate(longArrayOf(0, 1000))
@@ -357,6 +379,16 @@ object SendMsgHelper {
                         vibrationPattern = longArrayOf(0, 1000)
                     },
                     NotificationChannel(
+                        FCM_SILENT_CHANNEL_ID,
+                        ms.getString(R.string.ms_app_name),
+                        NotificationManager.IMPORTANCE_HIGH,
+                    ).apply {
+                        setSound(null, null)
+                        enableLights(true)
+                        enableVibration(false)
+                        vibrationPattern = null
+                    },
+                    NotificationChannel(
                         DOWNLOAD_CHANNEL_ID,
                         ms.getString(R.string.ms_downloading),
                         NotificationManager.IMPORTANCE_DEFAULT
@@ -370,8 +402,11 @@ object SendMsgHelper {
         }
     }
 
-    private fun getChannelId(msgType: MsgType): String =
-        if (msgType == MsgType.HEIGHT) FCM_CHANNEL_ID else DOWNLOAD_CHANNEL_ID
+    private fun getChannelId(msgType: MsgType, silent: Boolean): String = when {
+        msgType != MsgType.HEIGHT -> DOWNLOAD_CHANNEL_ID
+        silent -> FCM_SILENT_CHANNEL_ID
+        else -> FCM_CHANNEL_ID
+    }
 
     enum class MsgType {
         HEIGHT,
@@ -380,6 +415,7 @@ object SendMsgHelper {
     }
 
     private class CircleTask(
+        val source: String,
         @Volatile var current: Int,
         val total: Int,
     ) {
